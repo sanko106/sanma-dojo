@@ -187,34 +187,46 @@ function TileSVG({suit,num,label,w,h}){
     if(suit==='pin'){
       const c=W/2, p=W*0.27;
       const st=Math.max(W*0.05,2), r=Math.max(W*0.1,4);
-      const dot=(cx,cy,isRed)=><circle key={`${cx}${cy}`} cx={cx} cy={cy} r={r}
+      const dot=(cx,cy,isRed,key)=><circle key={key??`${cx}${cy}`} cx={cx} cy={cy} r={r}
         fill="none" stroke={isRed?'#b01010':'#1a3a9a'} strokeWidth={st}/>;
-      // 7筒: 参考画像の雪花/亀甲模様（中央1個＋周囲6個の花弁配置）
+      // 7筒: 斜め3青＋右下2x2赤
       if(num===7){
-        const cr=H*0.26; // 周囲円の半径（中心からの距離）
-        const pr=Math.max(W*0.095,3.5); // 各丸の半径
-        const angles=[0,60,120,180,240,300].map(a=>a*Math.PI/180);
+        const lx=c-p*0.85, rx=c+p*0.85;
         return<g>
-          {/* 中央 赤 */}
-          <circle cx={c} cy={H*0.5} r={pr} fill="none" stroke="#b01010" strokeWidth={st}/>
-          {/* 周囲6個 緑 */}
-          {angles.map((a,i)=>{
-            const px=c+Math.sin(a)*cr, py=H*0.5-Math.cos(a)*cr;
-            return<circle key={i} cx={px} cy={py} r={pr} fill="none" stroke="#1a6a1a" strokeWidth={st}/>;
-          })}
+          {dot(lx, H*0.19, false,'p7a')}
+          {dot(c,  H*0.36, false,'p7b')}
+          {dot(rx, H*0.53, false,'p7c')}
+          {dot(c,  H*0.68, true,'p7d')}
+          {dot(rx, H*0.68, true,'p7e')}
+          {dot(c,  H*0.84, true,'p7f')}
+          {dot(rx, H*0.84, true,'p7g')}
+        </g>;
+      }
+      // 6筒: 上2青, 下4赤
+      if(num===6){
+        return<g>
+          {dot(c-p,H*0.22,false,'p6a')}{dot(c+p,H*0.22,false,'p6b')}
+          {dot(c-p,H*0.5, true,'p6c')}{dot(c+p,H*0.5, true,'p6d')}
+          {dot(c-p,H*0.78,true,'p6e')}{dot(c+p,H*0.78,true,'p6f')}
+        </g>;
+      }
+      // 9筒: 上段青, 中段赤, 下段青
+      if(num===9){
+        return<g>
+          {dot(c-p,H*0.18,false,'p9a')}{dot(c,H*0.18,false,'p9b')}{dot(c+p,H*0.18,false,'p9c')}
+          {dot(c-p,H*0.5, true,'p9d')}{dot(c, H*0.5, true,'p9e')}{dot(c+p,H*0.5, true,'p9f')}
+          {dot(c-p,H*0.82,false,'p9g')}{dot(c,H*0.82,false,'p9h')}{dot(c+p,H*0.82,false,'p9i')}
         </g>;
       }
       const layouts={
         1:[[c,H/2,true]],
-        2:[[c,H*0.31],[c,H*0.69]],
-        3:[[c,H*0.24],[c,H*0.5,true],[c,H*0.76]],
-        4:[[c-p,H*0.31],[c+p,H*0.31],[c-p,H*0.69],[c+p,H*0.69]],
-        5:[[c-p,H*0.26],[c+p,H*0.26],[c,H*0.5,true],[c-p,H*0.74],[c+p,H*0.74]],
-        6:[[c-p,H*0.24],[c+p,H*0.24],[c-p,H*0.5],[c+p,H*0.5],[c-p,H*0.76],[c+p,H*0.76]],
-        8:[[c-p,H*0.19],[c+p,H*0.19],[c-p,H*0.38],[c+p,H*0.38],[c-p,H*0.62],[c+p,H*0.62],[c-p,H*0.81],[c+p,H*0.81]],
-        9:[[c-p,H*0.18],[c,H*0.18],[c+p,H*0.18],[c-p,H*0.5],[c,H*0.5,true],[c+p,H*0.5],[c-p,H*0.82],[c,H*0.82],[c+p,H*0.82]],
+        2:[[c,H*0.31,false],[c,H*0.69,false]],
+        3:[[c,H*0.24,false],[c,H*0.5,true],[c,H*0.76,false]],
+        4:[[c-p,H*0.31,false],[c+p,H*0.31,false],[c-p,H*0.69,false],[c+p,H*0.69,false]],
+        5:[[c-p,H*0.26,false],[c+p,H*0.26,false],[c,H*0.5,true],[c-p,H*0.74,false],[c+p,H*0.74,false]],
+        8:[[c-p,H*0.19,false],[c+p,H*0.19,false],[c-p,H*0.38,false],[c+p,H*0.38,false],[c-p,H*0.62,false],[c+p,H*0.62,false],[c-p,H*0.81,false],[c+p,H*0.81,false]],
       };
-      return (layouts[num]||[]).map(([x,y,red])=>dot(x,y,red));
+      return (layouts[num]||[]).map(([x,y,red],i)=>dot(x,y,red,i));
     }
     if(suit==='sou'){
       const G='#107020', R='#c01010';
@@ -261,48 +273,50 @@ function TileSVG({suit,num,label,w,h}){
         </g>;
       }
 
-      // 7索: 参考画像の亀甲/格子模様（特殊絵札）
+      // 7索: I / I I I / I I I / I I I  (1+3+3+3=10ではなく仕様: I/III/III/III=7個, 上1個が赤, 残り緑)
       if(num===7){
-        const my=H*0.5; // 中心Y
-        const mw=W*0.7, mh=H*0.55;
-        const x0=c-mw/2, y0=my-mh/2;
+        const lx=c-W*0.2, rx=c+W*0.2;
         return<g>
-          {/* 外枠 */}
-          <rect x={x0} y={y0} width={mw} height={mh} rx="3"
-            fill="none" stroke={G} strokeWidth={st}/>
-          {/* 縦の仕切り2本 */}
-          <line x1={x0+mw/3} y1={y0} x2={x0+mw/3} y2={y0+mh} stroke={G} strokeWidth={st*0.8}/>
-          <line x1={x0+mw*2/3} y1={y0} x2={x0+mw*2/3} y2={y0+mh} stroke={G} strokeWidth={st*0.8}/>
-          {/* 横の仕切り2本 */}
-          <line x1={x0} y1={y0+mh/3} x2={x0+mw} y2={y0+mh/3} stroke={G} strokeWidth={st*0.8}/>
-          <line x1={x0} y1={y0+mh*2/3} x2={x0+mw} y2={y0+mh*2/3} stroke={G} strokeWidth={st*0.8}/>
-          {/* 9マスにH型記号（中央だけ赤） */}
-          {[0,1,2].map(row=>[0,1,2].map(col=>{
-            const mx2=x0+mw/6+col*mw/3, my2=y0+mh/6+row*mh/3;
-            const isRed=row===1&&col===1;
-            const ssw=mw*0.22, ssh=mh*0.22, sst=Math.max(W*0.025,1.2);
-            return<g key={`${row}${col}`}>
-              <line x1={mx2} y1={my2-ssh/2} x2={mx2} y2={my2+ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
-              <line x1={mx2-ssw/2} y1={my2-ssh/2} x2={mx2+ssw/2} y2={my2-ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
-              <line x1={mx2-ssw/2} y1={my2+ssh/2} x2={mx2+ssw/2} y2={my2+ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
-            </g>;
-          }))}
+          {sym(c,  H*0.16, R,'s7t')}
+          {sym(lx, H*0.36, G,'s7ml')}{sym(c,H*0.36,G,'s7mc')}{sym(rx,H*0.36,G,'s7mr')}
+          {sym(lx, H*0.57, G,'s7cl')}{sym(c,H*0.57,G,'s7cc')}{sym(rx,H*0.57,G,'s7cr')}
+          {sym(lx, H*0.78, G,'s7bl')}{sym(c,H*0.78,G,'s7bc')}{sym(rx,H*0.78,G,'s7br')}
         </g>;
       }
 
-      // 2〜9索（1,7以外）: グリッド配置
+      // 3索: I / I I  (上1個, 下2個, 全て緑)
+      if(num===3){
+        return<g>
+          {sym(c,      H*0.28, G,'s3t')}
+          {sym(c-W*0.2,H*0.65, G,'s3bl')}
+          {sym(c+W*0.2,H*0.65, G,'s3br')}
+        </g>;
+      }
+
+      // 9索: 3x3グリッド, 中央列(col=1)が赤, 左右列が緑
+      if(num===9){
+        const lx=c-W*0.22, rx=c+W*0.22;
+        const ys=[H*0.22, H*0.5, H*0.78];
+        return<g>
+          {ys.map((y,i)=>[
+            sym(lx, y, G, `s9l${i}`),
+            sym(c,  y, R, `s9c${i}`),
+            sym(rx, y, G, `s9r${i}`),
+          ])}
+        </g>;
+      }
+
+      // 2〜9索（1,3,7,9以外）
       const layouts={
         2:{pts:[[c,H*0.32],[c,H*0.68]]},
-        3:{pts:[[c,H*0.24],[c,H*0.5],[c,H*0.76]]},
         4:{pts:[[c-W*0.18,H*0.32],[c+W*0.18,H*0.32],[c-W*0.18,H*0.68],[c+W*0.18,H*0.68]]},
         5:{pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
         6:{pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c-W*0.18,H*0.5],[c+W*0.18,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
         8:{pts:[[c-W*0.18,H*0.17],[c+W*0.18,H*0.17],[c-W*0.18,H*0.37],[c+W*0.18,H*0.37],[c-W*0.18,H*0.57],[c+W*0.18,H*0.57],[c-W*0.18,H*0.77],[c+W*0.18,H*0.77]]},
-        9:{pts:[[c-W*0.22,H*0.2],[c,H*0.2],[c+W*0.22,H*0.2],[c-W*0.22,H*0.5],[c,H*0.5],[c+W*0.22,H*0.5],[c-W*0.22,H*0.8],[c,H*0.8],[c+W*0.22,H*0.8]]},
       };
       const lay=layouts[num];
       if(!lay)return null;
-      const redIdx={3:[1],5:[2],9:[4]};
+      const redIdx={5:[2]};
       const reds=new Set(redIdx[num]||[]);
       return lay.pts.map(([px,py],i)=>sym(px,py,reds.has(i)?R:G,i));
     }
