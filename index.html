@@ -185,9 +185,25 @@ function TileSVG({suit,num,label,w,h}){
       </>;
     }
     if(suit==='pin'){
-      const dot=(cx,cy,isRed)=><circle key={`${cx}${cy}`} cx={cx} cy={cy} r={Math.max(W*0.1,4)}
-        fill="none" stroke={isRed?'#b01010':'#1a3a9a'} strokeWidth={Math.max(W*0.05,2)}/>;
-      const c=W/2,p=W*0.27;
+      const c=W/2, p=W*0.27;
+      const st=Math.max(W*0.05,2), r=Math.max(W*0.1,4);
+      const dot=(cx,cy,isRed)=><circle key={`${cx}${cy}`} cx={cx} cy={cy} r={r}
+        fill="none" stroke={isRed?'#b01010':'#1a3a9a'} strokeWidth={st}/>;
+      // 7筒: 参考画像の雪花/亀甲模様（中央1個＋周囲6個の花弁配置）
+      if(num===7){
+        const cr=H*0.26; // 周囲円の半径（中心からの距離）
+        const pr=Math.max(W*0.095,3.5); // 各丸の半径
+        const angles=[0,60,120,180,240,300].map(a=>a*Math.PI/180);
+        return<g>
+          {/* 中央 赤 */}
+          <circle cx={c} cy={H*0.5} r={pr} fill="none" stroke="#b01010" strokeWidth={st}/>
+          {/* 周囲6個 緑 */}
+          {angles.map((a,i)=>{
+            const px=c+Math.sin(a)*cr, py=H*0.5-Math.cos(a)*cr;
+            return<circle key={i} cx={px} cy={py} r={pr} fill="none" stroke="#1a6a1a" strokeWidth={st}/>;
+          })}
+        </g>;
+      }
       const layouts={
         1:[[c,H/2,true]],
         2:[[c,H*0.31],[c,H*0.69]],
@@ -195,57 +211,98 @@ function TileSVG({suit,num,label,w,h}){
         4:[[c-p,H*0.31],[c+p,H*0.31],[c-p,H*0.69],[c+p,H*0.69]],
         5:[[c-p,H*0.26],[c+p,H*0.26],[c,H*0.5,true],[c-p,H*0.74],[c+p,H*0.74]],
         6:[[c-p,H*0.24],[c+p,H*0.24],[c-p,H*0.5],[c+p,H*0.5],[c-p,H*0.76],[c+p,H*0.76]],
-        7:[[c-p,H*0.21],[c+p,H*0.21],[c,H*0.38,true],[c-p,H*0.55],[c+p,H*0.55],[c-p,H*0.79],[c+p,H*0.79]],
         8:[[c-p,H*0.19],[c+p,H*0.19],[c-p,H*0.38],[c+p,H*0.38],[c-p,H*0.62],[c+p,H*0.62],[c-p,H*0.81],[c+p,H*0.81]],
         9:[[c-p,H*0.18],[c,H*0.18],[c+p,H*0.18],[c-p,H*0.5],[c,H*0.5,true],[c+p,H*0.5],[c-p,H*0.82],[c,H*0.82],[c+p,H*0.82]],
       };
-      return (layouts[num]||[]).map(([x,y,r])=>dot(x,y,r));
+      return (layouts[num]||[]).map(([x,y,red])=>dot(x,y,red));
     }
     if(suit==='sou'){
-      // ハンマー（鎹）形の記号を並べる本物スタイル
-      // 記号1個: 縦棒＋上下に横棒（H型）
-      const sym=(cx,cy,col,key)=>{
-        const sw=W*0.13, sh=H*0.13, st=Math.max(W*0.032,1.5);
-        return<g key={key}>
-          {/* 縦棒 */}
-          <line x1={cx} y1={cy-sh/2} x2={cx} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
-          {/* 上横棒 */}
-          <line x1={cx-sw/2} y1={cy-sh/2} x2={cx+sw/2} y2={cy-sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
-          {/* 下横棒 */}
-          <line x1={cx-sw/2} y1={cy+sh/2} x2={cx+sw/2} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
-        </g>;
-      };
       const G='#107020', R='#c01010';
       const c=W/2;
-      // 1索: 鳥＋記号1個
+      const sw=W*0.13, sh=H*0.13, st=Math.max(W*0.032,1.5);
+      // H型記号（鎹）
+      const sym=(cx,cy,col,key)=><g key={key}>
+        <line x1={cx} y1={cy-sh/2} x2={cx} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
+        <line x1={cx-sw/2} y1={cy-sh/2} x2={cx+sw/2} y2={cy-sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
+        <line x1={cx-sw/2} y1={cy+sh/2} x2={cx+sw/2} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
+      </g>;
+
+      // 1索: 菊の花＋鳥（参考画像に近い絵札スタイル）
       if(num===1){
-        const bx=c, by=H*0.34;
+        const fx=c, fy=H*0.36; // 花の中心
+        const fr=W*0.18; // 花弁の広がり
+        const petals=8;
         return<g>
-          {/* 簡略化した鳥シルエット */}
-          <ellipse cx={bx} cy={by-H*0.06} rx={W*0.18} ry={H*0.06} fill={G}/>
-          <ellipse cx={bx+W*0.14} cy={by-H*0.1} rx={W*0.08} ry={H*0.04} fill={G}/>
-          <circle cx={bx+W*0.2} cy={by-H*0.12} r={W*0.03} fill="#1a1a1a"/>
-          <path d={`M${bx-W*0.18},${by-H*0.02} Q${bx},${by+H*0.06} ${bx+W*0.18},${by-H*0.02}`} fill={G} stroke="none"/>
-          {/* 下に記号1個 */}
-          {sym(c,H*0.72,R,'s1')}
+          {/* 菊の花：花弁8枚 */}
+          {Array.from({length:petals},(_,i)=>{
+            const a=i*Math.PI*2/petals;
+            const px=fx+Math.cos(a)*fr, py=fy+Math.sin(a)*fr*0.9;
+            return<ellipse key={i} cx={(fx+px)/2} cy={(fy+py)/2}
+              rx={fr*0.35} ry={fr*0.18}
+              transform={`rotate(${i*360/petals},${(fx+px)/2},${(fy+py)/2})`}
+              fill={G} opacity="0.85"/>;
+          })}
+          {/* 花の中心 */}
+          <circle cx={fx} cy={fy} r={W*0.07} fill="#f0c020"/>
+          <circle cx={fx} cy={fy} r={W*0.04} fill="#d09000"/>
+          {/* 鳥（簡略・胴体） */}
+          <ellipse cx={fx} cy={fy+H*0.16} rx={W*0.14} ry={H*0.055} fill={G}/>
+          {/* 鳥の頭 */}
+          <circle cx={fx+W*0.14} cy={fy+H*0.12} r={W*0.06} fill={G}/>
+          {/* 目 */}
+          <circle cx={fx+W*0.18} cy={fy+H*0.11} r={W*0.02} fill="#fffef8"/>
+          <circle cx={fx+W*0.185} cy={fy+H*0.11} r={W*0.01} fill="#1a1a1a"/>
+          {/* くちばし */}
+          <path d={`M${fx+W*0.22},${fy+H*0.13} L${fx+W*0.27},${fy+H*0.12} L${fx+W*0.22},${fy+H*0.115}`} fill={R}/>
+          {/* 尾羽 */}
+          <path d={`M${fx-W*0.12},${fy+H*0.16} Q${fx-W*0.22},${fy+H*0.2} ${fx-W*0.2},${fy+H*0.1}`} fill="none" stroke={G} strokeWidth={st*0.8}/>
+          {/* 下に赤記号1個 */}
+          {sym(c,H*0.78,R,'s1')}
         </g>;
       }
-      // 2〜9索: グリッド配置
-      // 列数・行数でレイアウトを決める
+
+      // 7索: 参考画像の亀甲/格子模様（特殊絵札）
+      if(num===7){
+        const my=H*0.5; // 中心Y
+        const mw=W*0.7, mh=H*0.55;
+        const x0=c-mw/2, y0=my-mh/2;
+        return<g>
+          {/* 外枠 */}
+          <rect x={x0} y={y0} width={mw} height={mh} rx="3"
+            fill="none" stroke={G} strokeWidth={st}/>
+          {/* 縦の仕切り2本 */}
+          <line x1={x0+mw/3} y1={y0} x2={x0+mw/3} y2={y0+mh} stroke={G} strokeWidth={st*0.8}/>
+          <line x1={x0+mw*2/3} y1={y0} x2={x0+mw*2/3} y2={y0+mh} stroke={G} strokeWidth={st*0.8}/>
+          {/* 横の仕切り2本 */}
+          <line x1={x0} y1={y0+mh/3} x2={x0+mw} y2={y0+mh/3} stroke={G} strokeWidth={st*0.8}/>
+          <line x1={x0} y1={y0+mh*2/3} x2={x0+mw} y2={y0+mh*2/3} stroke={G} strokeWidth={st*0.8}/>
+          {/* 9マスにH型記号（中央だけ赤） */}
+          {[0,1,2].map(row=>[0,1,2].map(col=>{
+            const mx2=x0+mw/6+col*mw/3, my2=y0+mh/6+row*mh/3;
+            const isRed=row===1&&col===1;
+            const ssw=mw*0.22, ssh=mh*0.22, sst=Math.max(W*0.025,1.2);
+            return<g key={`${row}${col}`}>
+              <line x1={mx2} y1={my2-ssh/2} x2={mx2} y2={my2+ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
+              <line x1={mx2-ssw/2} y1={my2-ssh/2} x2={mx2+ssw/2} y2={my2-ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
+              <line x1={mx2-ssw/2} y1={my2+ssh/2} x2={mx2+ssw/2} y2={my2+ssh/2} stroke={isRed?R:G} strokeWidth={sst} strokeLinecap="round"/>
+            </g>;
+          }))}
+        </g>;
+      }
+
+      // 2〜9索（1,7以外）: グリッド配置
       const layouts={
-        2:{cols:1,rows:2,pts:[[c,H*0.32],[c,H*0.68]]},
-        3:{cols:1,rows:3,pts:[[c,H*0.24],[c,H*0.5],[c,H*0.76]]},
-        4:{cols:2,rows:2,pts:[[c-W*0.18,H*0.32],[c+W*0.18,H*0.32],[c-W*0.18,H*0.68],[c+W*0.18,H*0.68]]},
-        5:{cols:2,rows:3,pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
-        6:{cols:2,rows:3,pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c-W*0.18,H*0.5],[c+W*0.18,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
-        7:{cols:2,rows:4,pts:[[c-W*0.18,H*0.18],[c+W*0.18,H*0.18],[c-W*0.18,H*0.4],[c+W*0.18,H*0.4],[c,H*0.59],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
-        8:{cols:2,rows:4,pts:[[c-W*0.18,H*0.17],[c+W*0.18,H*0.17],[c-W*0.18,H*0.37],[c+W*0.18,H*0.37],[c-W*0.18,H*0.57],[c+W*0.18,H*0.57],[c-W*0.18,H*0.77],[c+W*0.18,H*0.77]]},
-        9:{cols:3,rows:3,pts:[[c-W*0.22,H*0.2],[c,H*0.2],[c+W*0.22,H*0.2],[c-W*0.22,H*0.5],[c,H*0.5],[c+W*0.22,H*0.5],[c-W*0.22,H*0.8],[c,H*0.8],[c+W*0.22,H*0.8]]},
+        2:{pts:[[c,H*0.32],[c,H*0.68]]},
+        3:{pts:[[c,H*0.24],[c,H*0.5],[c,H*0.76]]},
+        4:{pts:[[c-W*0.18,H*0.32],[c+W*0.18,H*0.32],[c-W*0.18,H*0.68],[c+W*0.18,H*0.68]]},
+        5:{pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
+        6:{pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c-W*0.18,H*0.5],[c+W*0.18,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
+        8:{pts:[[c-W*0.18,H*0.17],[c+W*0.18,H*0.17],[c-W*0.18,H*0.37],[c+W*0.18,H*0.37],[c-W*0.18,H*0.57],[c+W*0.18,H*0.57],[c-W*0.18,H*0.77],[c+W*0.18,H*0.77]]},
+        9:{pts:[[c-W*0.22,H*0.2],[c,H*0.2],[c+W*0.22,H*0.2],[c-W*0.22,H*0.5],[c,H*0.5],[c+W*0.22,H*0.5],[c-W*0.22,H*0.8],[c,H*0.8],[c+W*0.22,H*0.8]]},
       };
       const lay=layouts[num];
       if(!lay)return null;
-      // 5索の中央・3索の中央・7の中央を赤に
-      const redIdx={3:[1],5:[2],7:[4],9:[4]};
+      const redIdx={3:[1],5:[2],9:[4]};
       const reds=new Set(redIdx[num]||[]);
       return lay.pts.map(([px,py],i)=>sym(px,py,reds.has(i)?R:G,i));
     }
