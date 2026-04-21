@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>三麻道場</title>
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0f1117">
+<meta name="theme-color" content="#1a1208">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="三麻道場">
@@ -14,162 +14,83 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700;900&family=DM+Mono:wght@400;500&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d3f;
-  --border:#2e3a52;--border2:#3d4f6e;
-  --text:#e8eaf0;--text2:#8b96b0;--text3:#5a6480;
+  --bg:#1a1208;--bg2:#221a0e;--bg3:#2e2414;--bg4:#3a2e1c;
+  --border:#5a4a2a;--border2:#7a6a3a;
+  --text:#f0e8d0;--text2:#c8b88a;--text3:#8a7a50;
   --red:#e84545;--red2:#ff8080;--redbg:#2a1010;
   --blue:#4a9eff;--blue2:#74b9ff;--bluebg:#0d1e35;
   --green:#2ecc71;--green2:#55efc4;--greenbg:#0d2a1e;
   --gold:#f0b429;--goldbg:#2a1f00;
-  --accent:#4a9eff;
-  --r:10px;--r2:14px;--r3:18px;
-  /* スマホ基準のタイル */
-  --tw:48px;--th:64px;--tf:22px;--tsf:11px;
+  --accent:#d4a030;
+  --r:10px;--r2:14px;
+  --tw:52px;--th:70px;
 }
-/* PCでタイルを少し大きく */
-@media(min-width:768px){
-  :root{--tw:52px;--th:68px;--tf:24px;--tsf:12px}
-}
+@media(min-width:768px){:root{--tw:56px;--th:76px}}
 body{font-family:'Zen Kaku Gothic New',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(100,80,40,.04) 3px,rgba(100,80,40,.04) 4px);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* ===== レイアウト ===== */
-.app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
-
-/* ボトムナビ（スマホ） */
-.bottom-nav{
-  display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:var(--bg2);border-top:1px solid var(--border);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.bottom-nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px 4px 8px;border:none;background:none;color:var(--text3);
-  font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;
-  letter-spacing:.05em;gap:4px;transition:color .15s;
-  -webkit-tap-highlight-color:transparent;
-}
-.bottom-nav-btn .icon{font-size:22px;line-height:1}
-.bottom-nav-btn.active{color:var(--accent)}
-
-/* サイドナビ（PC） */
+.app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;position:relative;z-index:1}
+.bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--bg2);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.bnb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;border:none;background:none;color:var(--text3);font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;gap:3px;transition:color .15s}
+.bnb .ic{font-size:22px;line-height:1}
+.bnb.active{color:var(--accent)}
 .pc-layout{display:flex;flex:1}
-.side-nav{
-  width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
-  padding:20px 12px;display:flex;flex-direction:column;gap:4px;
-  position:sticky;top:0;height:100vh;overflow-y:auto;
-}
-.side-nav-logo{font-size:18px;font-weight:900;padding:8px 12px 20px;letter-spacing:.05em}
-.side-nav-logo span{color:var(--accent)}
-.side-nav-btn{
-  display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;
-  background:none;color:var(--text2);font-family:inherit;font-size:14px;
-  font-weight:500;cursor:pointer;border-radius:var(--r);transition:all .15s;text-align:left;
-}
-.side-nav-btn .icon{font-size:18px}
-.side-nav-btn:hover{background:var(--bg3);color:var(--text)}
-.side-nav-btn.active{background:var(--bg4);color:var(--accent)}
-
+.side-nav{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side-logo{font-size:20px;font-weight:900;padding:8px 12px 20px;letter-spacing:.08em;font-family:'Noto Serif JP',serif}
+.side-logo span{color:var(--accent)}
+.snb{display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;background:none;color:var(--text2);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--r);transition:all .15s;text-align:left;width:100%}
+.snb .ic{font-size:18px}
+.snb:hover{background:var(--bg3);color:var(--text)}
+.snb.active{background:var(--bg4);color:var(--accent)}
 .content-area{flex:1;overflow-y:auto}
-.main{padding:20px;max-width:680px;margin:0 auto;padding-bottom:100px}
-@media(min-width:768px){.main{padding:28px;padding-bottom:28px}}
-/* スマホ：ボトムナビ分の余白 */
-@media(max-width:767px){.bottom-nav{display:flex}.side-nav{display:none}.main{padding-bottom:calc(80px + env(safe-area-inset-bottom))}}
-@media(min-width:768px){.bottom-nav{display:none}.pc-layout{display:flex}.side-nav{display:flex}}
+.main{padding:20px;max-width:680px;margin:0 auto;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+@media(max-width:767px){.bottom-nav{display:flex}.side-nav{display:none}}
+@media(min-width:768px){.bottom-nav{display:none}.side-nav{display:flex}.main{padding:28px 32px;padding-bottom:32px}}
 
-/* ===== 牌 ===== */
-.tile{
-  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
-  width:var(--tw);height:var(--th);border-radius:7px;
-  font-weight:700;line-height:1;position:relative;flex-shrink:0;user-select:none;
-  border:2px solid transparent;transition:transform .12s,box-shadow .12s,border-color .12s;
-  cursor:pointer;touch-action:manipulation;
-}
-.tile-num{font-size:var(--tf);font-family:'DM Mono',monospace}
-.tile-suit{font-size:var(--tsf);margin-top:2px}
-.tile.man{background:#200c0c;border-color:#7a2222;color:#ff8888}
-.tile.man .tile-suit{color:#cc5555}
-.tile.pin{background:#0b1020;border-color:#224080;color:#88bbff}
-.tile.pin .tile-suit{color:#5588cc}
-.tile.sou{background:#0b200e;border-color:#227840;color:#88ffaa}
-.tile.sou .tile-suit{color:#55cc77}
-.tile.honor{background:#1a1422;border-color:#503468;color:#d4a8ff}
-.tile.honor .tile-num{font-size:calc(var(--tf) - 4px)}
-.tile.kita{background:#0e1e20;border-color:#226268;color:#88f0ff}
-.tile.kita .tile-num{font-size:calc(var(--tf) - 6px)}
-/* 状態 */
-.tile.correct{border-color:var(--green) !important;box-shadow:0 0 0 3px rgba(46,204,113,.35),0 0 16px rgba(46,204,113,.25);transform:translateY(-6px)}
-.tile.wrong{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(232,69,69,.35);animation:shake .35s ease}
-.tile.answer-hi{border-color:var(--green) !important;box-shadow:0 0 0 2px rgba(46,204,113,.4)}
-.tile.dimmed{opacity:.35}
-.tile.disabled{cursor:default !important;pointer-events:none}
-.tile:active:not(.disabled){transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.5)}
-/* 小さいサイズ */
-.tile.sm{--tw:38px;--th:50px;--tf:18px;--tsf:9px;border-radius:5px}
-.tile.xs{--tw:30px;--th:40px;--tf:14px;--tsf:8px;border-radius:4px;cursor:default}
-.tile-sep{width:2px;background:var(--border2);border-radius:1px;align-self:stretch;margin:0 2px;flex-shrink:0}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.tile-wrap{display:inline-block;position:relative;flex-shrink:0;cursor:pointer;touch-action:manipulation;transition:transform .12s,filter .12s}
+.tile-wrap:active:not(.disabled){transform:translateY(-5px)}
+.tile-wrap.disabled{cursor:default;pointer-events:none}
+.tile-wrap.state-correct{transform:translateY(-10px);filter:drop-shadow(0 0 10px rgba(46,204,113,.9))}
+.tile-wrap.state-wrong{filter:drop-shadow(0 0 10px rgba(232,69,69,.9));animation:shake .35s ease}
+.tile-wrap.state-dimmed{opacity:.25}
+.tile-wrap.state-answer-hi{filter:drop-shadow(0 0 8px rgba(46,204,113,.7))}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes popIn{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .pop{animation:popIn .3s ease forwards}
 .fade-up{animation:fadeUp .2s ease forwards}
 
-/* ===== カード ===== */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
-.card+.card,.card+div>.card{margin-top:14px}
-.section-title{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.section-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.sec-title{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;flex-shrink:0}
 
-/* ===== ボタン ===== */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:12px 20px;border:1px solid var(--border2);border-radius:var(--r);
-  background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;
-  font-weight:600;cursor:pointer;transition:all .15s;touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;white-space:nowrap;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg3);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap}
 .btn:active{transform:scale(.97)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#000}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1a1208;font-weight:900}
 .btn.primary:active{opacity:.8}
 .btn.danger{border-color:var(--red);color:var(--red2)}
 .btn.danger:active{background:var(--redbg)}
-.btn.success{border-color:var(--green);color:var(--green2)}
-.btn.success:active{background:var(--greenbg)}
 .btn.gold{border-color:var(--gold);color:var(--gold)}
 .btn.gold:active{background:var(--goldbg)}
 .btn.sm{padding:9px 14px;font-size:13px}
-.btn.lg{padding:16px 28px;font-size:16px;border-radius:var(--r2)}
+.btn.lg{padding:16px 28px;font-size:17px;border-radius:var(--r2);letter-spacing:.05em}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
 .btn-full{width:100%}
 
-/* ===== フォーム ===== */
-input[type=text],textarea,select{
-  width:100%;padding:13px 14px;background:var(--bg);border:1px solid var(--border);
-  border-radius:var(--r);color:var(--text);font-family:inherit;font-size:14px;
-  outline:none;transition:border .15s;-webkit-appearance:none;appearance:none;
-}
+input[type=text],textarea,select{width:100%;padding:13px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border .15s;-webkit-appearance:none}
 input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent)}
 textarea{resize:vertical;line-height:1.6}
 label{font-size:12px;color:var(--text2);display:block;margin-bottom:6px}
 .form-group{margin-bottom:18px}
-
-/* タグ */
 .tags-wrap{display:flex;flex-wrap:wrap;gap:8px}
-.tag{
-  padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;
-  cursor:pointer;border:1px solid transparent;transition:all .15s;
-  touch-action:manipulation;
-}
-.tag.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.tag{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;touch-action:manipulation}
+.tag.on{background:var(--accent);color:#1a1208;border-color:var(--accent)}
 .tag.off{background:var(--bg3);color:var(--text2);border-color:var(--border)}
-.tag.off:active{border-color:var(--accent)}
 
-/* バッジ */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
 .badge.red{background:var(--redbg);color:var(--red2);border:1px solid var(--red)}
 .badge.green{background:var(--greenbg);color:var(--green2);border:1px solid var(--green)}
@@ -177,92 +98,68 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:6px}
 .badge.gold{background:var(--goldbg);color:var(--gold);border:1px solid var(--gold)}
 .badge.gray{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
 
-/* ===== トレーニング ===== */
-.timer-wrap{display:flex;align-items:center;gap:8px}
 .timer-ring{position:relative;width:54px;height:54px;flex-shrink:0}
 .timer-ring svg{transform:rotate(-90deg)}
 .timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;font-family:'DM Mono',monospace}
 .progress-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
 .progress-fill{height:100%;border-radius:3px;transition:width .3s ease}
 .score-big{font-size:64px;font-weight:900;font-family:'DM Mono',monospace;text-align:center;line-height:1}
+.feedback{border-radius:var(--r2);padding:16px;margin-top:14px;text-align:center;animation:popIn .25s ease}
+.feedback.ok{background:var(--greenbg);border:1px solid var(--green)}
+.feedback.ng{background:var(--redbg);border:1px solid var(--red)}
+.fb-icon{font-size:40px;margin-bottom:6px}
+.fb-title{font-size:20px;font-weight:900;margin-bottom:4px}
+.fb-sub{font-size:13px;color:var(--text2);line-height:1.6}
 
-/* 結果フィードバック */
-.feedback{
-  border-radius:var(--r2);padding:16px;margin-top:14px;text-align:center;
-  animation:popIn .25s ease;
-}
-.feedback.correct-fb{background:var(--greenbg);border:1px solid var(--green)}
-.feedback.wrong-fb{background:var(--redbg);border:1px solid var(--red)}
-.feedback-icon{font-size:40px;margin-bottom:6px}
-.feedback-title{font-size:20px;font-weight:900;margin-bottom:4px}
-.feedback-sub{font-size:13px;color:var(--text2);line-height:1.6}
-
-/* カレンダー */
 .cal-wrap{overflow-x:auto;padding-bottom:4px}
 .cal-grid{display:flex;gap:3px}
 .cal-col{display:flex;flex-direction:column;gap:3px}
 .cal-cell{width:14px;height:14px;border-radius:2px;flex-shrink:0}
-.cal-cell.lv0{background:var(--bg3)}
-.cal-cell.lv1{background:#0d3320}
-.cal-cell.lv2{background:#166534}
-.cal-cell.lv3{background:#22c55e}
-.cal-cell.lv4{background:#86efac}
+.cal-cell.lv0{background:var(--bg3)}.cal-cell.lv1{background:#0d3320}.cal-cell.lv2{background:#166534}.cal-cell.lv3{background:#22c55e}.cal-cell.lv4{background:#86efac}
 
-/* グラフ */
 .bar-chart{display:flex;flex-direction:column;gap:10px}
-.bar-row2{display:flex;align-items:center;gap:10px}
-.bar-label2{font-size:12px;color:var(--text2);width:100px;flex-shrink:0;text-align:right}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-lbl{font-size:12px;color:var(--text2);width:100px;flex-shrink:0;text-align:right}
 .bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
-.bar-fill{height:100%;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#000;transition:width .6s ease;border-radius:4px}
-.bar-val2{font-size:12px;font-family:'DM Mono',monospace;color:var(--text2);width:44px;flex-shrink:0}
+.bar-fill{height:100%;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#1a1208;transition:width .6s ease;border-radius:4px}
+.bar-val{font-size:12px;font-family:'DM Mono',monospace;color:var(--text2);width:44px;flex-shrink:0}
 
-/* 統計 */
 .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media(min-width:480px){.stat-grid{grid-template-columns:repeat(4,1fr)}}
 .stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
 .stat-num{font-size:28px;font-weight:900;font-family:'DM Mono',monospace;color:var(--accent)}
 .stat-lbl{font-size:11px;color:var(--text2);margin-top:4px;letter-spacing:.05em}
 
-/* 問題カード */
 .prob-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:12px}
 .prob-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-
-/* 空 */
 .empty{text-align:center;padding:60px 20px;color:var(--text3)}
 .empty-icon{font-size:52px;margin-bottom:14px}
 .empty-text{font-size:14px;line-height:1.9}
+.hand-area{display:flex;flex-wrap:wrap;gap:5px;align-items:flex-end;min-height:80px;padding:10px;background:var(--bg);border:1px dashed var(--border);border-radius:var(--r)}
+.tile-sep-el{width:3px;align-self:stretch;background:var(--border2);border-radius:2px;margin:0 2px;flex-shrink:0}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useRef,useCallback,useMemo} = React;
+const {useState,useEffect,useRef,useCallback} = React;
 
-// ===== 定数 =====
 const CATEGORIES = ['多面張','5ブロック','孤立牌','守備','鳴き判断','リーチ判断','北抜き','字牌整理','ターツ選択','その他'];
 const HONOR_ITEMS = [{num:1,label:'東'},{num:2,label:'南'},{num:3,label:'西'},{num:4,label:'白'},{num:5,label:'発'},{num:6,label:'中'}];
-const KITA_ITEMS  = [{num:1,label:'北'}];
+const KITA_ITEMS = [{num:1,label:'北'}];
 
-// ===== LocalStorage =====
 const LS = {
   get:(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},
   set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
 };
 
-// ===== ユーティリティ =====
 const genId = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const suitOrder = s=>({man:0,pin:1,sou:2,honor:3,kita:4}[s]??5);
 const sortTiles = ts=>[...ts].sort((a,b)=>suitOrder(a.suit)-suitOrder(b.suit)||a.num-b.num);
 const tileKey = t=>`${t.suit}_${t.num}`;
 const todayKey = ()=>new Date().toISOString().slice(0,10);
+function lastNDays(n){const d=[];for(let i=n-1;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);d.push(x.toISOString().slice(0,10));}return d;}
 
-function lastNDays(n){
-  const days=[];
-  for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  return days;
-}
-
-// 変形エンジン
 function transformTiles(tiles,type){
   if(type==='color') return sortTiles(tiles.map(t=>t.suit==='pin'?{...t,suit:'sou'}:t.suit==='sou'?{...t,suit:'pin'}:t));
   if(type==='flip')  return sortTiles(tiles.map(t=>['pin','sou'].includes(t.suit)?{...t,num:10-t.num}:t.suit==='man'?{...t,num:t.num===1?9:1}:t));
@@ -270,34 +167,110 @@ function transformTiles(tiles,type){
   return tiles;
 }
 function transformTile(tile,type){if(!tile)return null;return transformTiles([tile],type)[0]??tile;}
-const transformLabel = t=>({color:'色替え(p⇔s)',flip:'数字反転',both:'色替え＋反転',none:'オリジナル'}[t]??'');
+const tfLabel = t=>({color:'色替え(p⇔s)',flip:'数字反転',both:'色替え＋反転',none:'オリジナル'}[t]??'');
+function priorityScore(p){if(p.totalCount===0)return -1;return p.correctCount/p.totalCount;}
 
-function priorityScore(p){
-  if(p.totalCount===0)return -1;
-  return p.correctCount/p.totalCount;
+// ===== 牌SVG =====
+function TileSVG({suit,num,label,w,h}){
+  const W=w||52,H=h||70;
+  const KANJI={1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九'};
+
+  const renderFace=()=>{
+    if(suit==='man'){
+      return <>
+        <text x={W/2} y={H*0.51} textAnchor="middle" fontSize={H*0.37} fontWeight="900"
+          fontFamily="'Noto Serif JP',serif" fill="#cc1a0a" dominantBaseline="middle">{KANJI[num]||num}</text>
+        <text x={W/2} y={H*0.79} textAnchor="middle" fontSize={H*0.14} fontWeight="700"
+          fontFamily="'Noto Serif JP',serif" fill="#8a3020">萬</text>
+      </>;
+    }
+    if(suit==='pin'){
+      const dot=(cx,cy,isRed)=><circle key={`${cx}${cy}`} cx={cx} cy={cy} r={Math.max(W*0.1,4)}
+        fill="none" stroke={isRed?'#b01010':'#1a3a9a'} strokeWidth={Math.max(W*0.05,2)}/>;
+      const c=W/2,p=W*0.27;
+      const layouts={
+        1:[[c,H/2,true]],
+        2:[[c,H*0.31],[c,H*0.69]],
+        3:[[c,H*0.24],[c,H*0.5,true],[c,H*0.76]],
+        4:[[c-p,H*0.31],[c+p,H*0.31],[c-p,H*0.69],[c+p,H*0.69]],
+        5:[[c-p,H*0.26],[c+p,H*0.26],[c,H*0.5,true],[c-p,H*0.74],[c+p,H*0.74]],
+        6:[[c-p,H*0.24],[c+p,H*0.24],[c-p,H*0.5],[c+p,H*0.5],[c-p,H*0.76],[c+p,H*0.76]],
+        7:[[c-p,H*0.21],[c+p,H*0.21],[c,H*0.38,true],[c-p,H*0.55],[c+p,H*0.55],[c-p,H*0.79],[c+p,H*0.79]],
+        8:[[c-p,H*0.19],[c+p,H*0.19],[c-p,H*0.38],[c+p,H*0.38],[c-p,H*0.62],[c+p,H*0.62],[c-p,H*0.81],[c+p,H*0.81]],
+        9:[[c-p,H*0.18],[c,H*0.18],[c+p,H*0.18],[c-p,H*0.5],[c,H*0.5,true],[c+p,H*0.5],[c-p,H*0.82],[c,H*0.82],[c+p,H*0.82]],
+      };
+      return (layouts[num]||[]).map(([x,y,r])=>dot(x,y,r));
+    }
+    if(suit==='sou'){
+      const bw=Math.max(W*0.12,5);
+      const bam=(x,col='#107020')=>{
+        const y1=H*0.1,y2=H*0.9,mid=(y1+y2)/2;
+        return<g key={x}>
+          <rect x={x-bw/2} y={y1} width={bw} height={y2-y1} rx={bw/2}
+            fill={col} stroke={col==='#b01010'?'#7a0808':'#0a5010'} strokeWidth="0.5"/>
+          <line x1={x-bw/2+1} y1={mid} x2={x+bw/2-1} y2={mid}
+            stroke={col==='#b01010'?'#7a0808':'#0a5010'} strokeWidth="1"/>
+        </g>;
+      };
+      const c=W/2,p=W*0.27,p2=W*0.13;
+      const layouts={
+        1:[[c,'#b01010']],
+        2:[[c-p2],[c+p2]],
+        3:[[c-p],[c,'#b01010'],[c+p]],
+        4:[[c-p],[c-p2],[c+p2],[c+p]],
+        5:[[c-p],[c-p2],[c,'#b01010'],[c+p2],[c+p]],
+        6:[[c-p],[c-p2],[c+p2],[c+p],[c-p*0.6],[c+p*0.6]],
+        7:[[c-p],[c-p2],[c,'#b01010'],[c+p2],[c+p],[c-p*0.7],[c+p*0.7]],
+        8:[[c-p],[c-p*0.6],[c-p*0.2],[c+p*0.2],[c+p*0.6],[c+p],[c-p*0.8],[c+p*0.8]],
+        9:[[c-p],[c-p*0.6],[c-p*0.2],[c+p*0.2],[c+p*0.6],[c+p],[c-p*0.8],[c,'#b01010'],[c+p*0.8]],
+      };
+      return (layouts[num]||[]).map(([x,col])=>bam(x,col));
+    }
+    if(suit==='honor'){
+      const col={1:'#1a1a1a',2:'#1a1a1a',3:'#1a1a1a',4:'#1a1a1a',5:'#107020',6:'#cc1a0a'}[num]||'#1a1a1a';
+      return<text x={W/2} y={H*0.55} textAnchor="middle" fontSize={H*0.40} fontWeight="900"
+        fontFamily="'Noto Serif JP',serif" fill={col} dominantBaseline="middle">{label}</text>;
+    }
+    if(suit==='kita'){
+      return<>
+        <text x={W/2} y={H*0.43} textAnchor="middle" fontSize={H*0.33} fontWeight="900"
+          fontFamily="'Noto Serif JP',serif" fill="#1a3a9a" dominantBaseline="middle">北</text>
+        <text x={W/2} y={H*0.76} textAnchor="middle" fontSize={H*0.16} fontWeight="700"
+          fontFamily="'Noto Serif JP',serif" fill="#1a3a9a">抜</text>
+      </>;
+    }
+    return null;
+  };
+
+  return(
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{display:'block',overflow:'visible'}}>
+      <rect x="2" y="3" width={W} height={H} rx="6" fill="rgba(0,0,0,.4)"/>
+      <rect x="0" y="0" width={W} height={H} rx="6" fill="#f5f0e2" stroke="#b8a878" strokeWidth="1"/>
+      <rect x="1" y="1" width={W-2} height={H*0.4} rx="5" fill="#fffef8" opacity="0.55"/>
+      <rect x="3" y="3" width={W-6} height={H-6} rx="4" fill="none" stroke="#d4c8a8" strokeWidth="0.5"/>
+      {renderFace()}
+    </svg>
+  );
 }
 
-// ===== 牌コンポーネント =====
 function Tile({suit,num,label,size='',state='',onClick,disabled}){
-  let dispNum=String(num),dispSuit={man:'萬',pin:'筒',sou:'索',honor:'',kita:''}[suit]??'';
-  if(suit==='honor'){dispNum=label??'？';dispSuit='';}
-  if(suit==='kita'){dispNum='北';dispSuit='抜';}
-  const cls=['tile',suit,size,state,disabled?'disabled':''].filter(Boolean).join(' ');
+  const root=document.documentElement;
+  const TW=size==='xs'?30:size==='sm'?40:parseInt(getComputedStyle(root).getPropertyValue('--tw'))||52;
+  const TH=size==='xs'?40:size==='sm'?54:parseInt(getComputedStyle(root).getPropertyValue('--th'))||70;
+  const cls=['tile-wrap',state?`state-${state}`:'',disabled?'disabled':''].filter(Boolean).join(' ');
   return(
-    <div className={cls} onClick={!disabled?onClick:undefined}>
-      <span className="tile-num">{dispNum}</span>
-      {dispSuit&&<span className="tile-suit">{dispSuit}</span>}
+    <div className={cls} onClick={!disabled?onClick:undefined} style={{width:TW,height:TH}}>
+      <TileSVG suit={suit} num={num} label={label} w={TW} h={TH}/>
     </div>
   );
 }
 
-// ===== 牌パレット =====
 const SUIT_DEFS=[
-  {key:'pin',label:'筒 p',nums:[1,2,3,4,5,6,7,8,9]},
-  {key:'sou',label:'索 s',nums:[1,2,3,4,5,6,7,8,9]},
-  {key:'man',label:'萬 m',nums:[1,9]},
+  {key:'pin',label:'筒子 p',nums:[1,2,3,4,5,6,7,8,9]},
+  {key:'sou',label:'索子 s',nums:[1,2,3,4,5,6,7,8,9]},
+  {key:'man',label:'萬子 m',nums:[1,9]},
   {key:'honor',label:'字牌',items:HONOR_ITEMS},
-  {key:'kita',label:'北',items:KITA_ITEMS},
+  {key:'kita',label:'北（抜）',items:KITA_ITEMS},
 ];
 
 function TilePalette({onAdd,maxCount,currentCount}){
@@ -306,31 +279,28 @@ function TilePalette({onAdd,maxCount,currentCount}){
   const cur=SUIT_DEFS.find(s=>s.key===suit);
   return(
     <div>
-      {/* スーツ選択タブ */}
       <div style={{display:'flex',gap:4,marginBottom:10,flexWrap:'wrap'}}>
         {SUIT_DEFS.map(s=>(
           <button key={s.key} onClick={()=>setSuit(s.key)} style={{
             padding:'9px 14px',border:`1px solid ${suit===s.key?'var(--accent)':'var(--border)'}`,
             borderRadius:'var(--r)',background:suit===s.key?'var(--accent)':'var(--bg3)',
-            color:suit===s.key?'#000':'var(--text2)',cursor:'pointer',fontSize:13,
+            color:suit===s.key?'#1a1208':'var(--text2)',cursor:'pointer',fontSize:13,
             fontFamily:'inherit',fontWeight:700,transition:'all .15s',
           }}>{s.label}</button>
         ))}
       </div>
-      {/* 牌ボタン */}
-      <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+      <div style={{display:'flex',flexWrap:'wrap',gap:6,padding:8,background:'var(--bg)',borderRadius:'var(--r)',border:'1px solid var(--border)'}}>
         {cur&&(cur.items||cur.nums.map(n=>({num:n}))).map(item=>(
           <Tile key={item.num} suit={suit} num={item.num} label={item.label}
             onClick={()=>!full&&onAdd({suit,num:item.num,label:item.label,id:genId()})}
             disabled={full}/>
         ))}
       </div>
-      {full&&<div style={{fontSize:12,color:'var(--text3)',marginTop:6}}>最大{maxCount}牌です（タップで削除）</div>}
+      {full&&<div style={{fontSize:12,color:'var(--text3)',marginTop:6}}>最大{maxCount}牌（タップで削除）</div>}
     </div>
   );
 }
 
-// ===== 問題登録 =====
 function AddProblemScreen({onSave}){
   const [hand,setHand]=useState([]);
   const [tsumo,setTsumo]=useState(null);
@@ -338,149 +308,106 @@ function AddProblemScreen({onSave}){
   const [memo,setMemo]=useState('');
   const [tags,setTags]=useState([]);
   const [step,setStep]=useState(0);
-  const [answerSuit,setAnswerSuit]=useState('pin');
-
+  const [ansSuit,setAnsSuit]=useState('pin');
   const addHand=t=>setHand(prev=>sortTiles([...prev,t]));
   const removeHand=id=>setHand(prev=>prev.filter(t=>t.id!==id));
-
-  const ANSWER_SUIT_DEFS=[
-    {key:'pin',label:'筒 p',nums:[1,2,3,4,5,6,7,8,9]},
-    {key:'sou',label:'索 s',nums:[1,2,3,4,5,6,7,8,9]},
-    {key:'man',label:'萬 m',nums:[1,9]},
-    {key:'honor',label:'字牌',items:HONOR_ITEMS},
-    {key:'kita',label:'北',items:KITA_ITEMS},
-  ];
-  const curAns=ANSWER_SUIT_DEFS.find(s=>s.key===answerSuit);
-
+  const ansCur=SUIT_DEFS.find(s=>s.key===ansSuit);
   const handleSave=()=>{
     if(hand.length<1)return alert('手牌を入力してください');
     if(!answer)return alert('正解牌を選択してください');
     onSave({id:genId(),hand,tsumo,answer,memo,tags,createdAt:Date.now(),correctCount:0,totalCount:0,reviewFlag:false});
     setHand([]);setTsumo(null);setAnswer(null);setMemo('');setTags([]);setStep(0);
   };
-
-  const STEPS=[{icon:'🀄',label:'手牌'},{icon:'➕',label:'ツモ'},{icon:'✅',label:'正解牌'},{icon:'📝',label:'解説'}];
-
+  const STEPS=[{ic:'🀄',lb:'手牌'},{ic:'➕',lb:'ツモ'},{ic:'✅',lb:'正解牌'},{ic:'📝',lb:'解説'}];
   return(
     <div className="fade-up">
-      {/* ステップインジケーター */}
       <div style={{display:'flex',gap:0,marginBottom:18,background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--r2)',overflow:'hidden'}}>
         {STEPS.map((s,i)=>(
           <button key={i} onClick={()=>setStep(i)} style={{
-            flex:1,padding:'12px 4px',border:'none',
-            background:step===i?'var(--accent)':'none',
-            color:step===i?'#000':'var(--text3)',cursor:'pointer',
-            fontFamily:'inherit',fontSize:11,fontWeight:700,display:'flex',
-            flexDirection:'column',alignItems:'center',gap:3,transition:'all .15s',
-          }}>
-            <span style={{fontSize:18}}>{s.icon}</span>{s.label}
-          </button>
+            flex:1,padding:'12px 4px',border:'none',background:step===i?'var(--accent)':'none',
+            color:step===i?'#1a1208':'var(--text3)',cursor:'pointer',fontFamily:'inherit',
+            fontSize:11,fontWeight:700,display:'flex',flexDirection:'column',alignItems:'center',gap:3,
+          }}><span style={{fontSize:18}}>{s.ic}</span>{s.lb}</button>
         ))}
       </div>
-
-      {/* 手牌プレビュー（常時） */}
       <div className="card" style={{marginBottom:14}}>
-        <div className="section-title">現在の手牌（タップで削除）</div>
-        <div style={{display:'flex',flexWrap:'wrap',gap:5,alignItems:'flex-end',minHeight:68,padding:6,background:'var(--bg)',borderRadius:'var(--r)',border:'1px solid var(--border)'}}>
-          {hand.length===0
-            ?<span style={{color:'var(--text3)',fontSize:13,lineHeight:'56px',paddingLeft:8}}>牌をタップして追加...</span>
-            :hand.map(t=><Tile key={t.id} {...t} onClick={()=>removeHand(t.id)}/>)
-          }
-          {tsumo&&<><div className="tile-sep"/><Tile {...tsumo} onClick={()=>setTsumo(null)}/></>}
+        <div className="sec-title">手牌プレビュー（タップで削除）</div>
+        <div className="hand-area">
+          {hand.length===0?<span style={{color:'var(--text3)',fontSize:13,lineHeight:'70px',paddingLeft:8}}>牌をタップして追加...</span>
+            :hand.map(t=><Tile key={t.id} {...t} onClick={()=>removeHand(t.id)}/>)}
+          {tsumo&&<><div className="tile-sep-el"/><Tile {...tsumo} onClick={()=>setTsumo(null)}/></>}
         </div>
-        {answer&&(
-          <div style={{marginTop:10,display:'flex',alignItems:'center',gap:8}}>
-            <span style={{fontSize:12,color:'var(--text2)'}}>正解牌：</span>
-            <Tile {...answer} state="answer-hi"/>
-            <span style={{fontSize:13,color:'var(--green)',fontWeight:700}}>✓ 選択済み</span>
-          </div>
-        )}
+        {answer&&<div style={{marginTop:10,display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontSize:12,color:'var(--text2)'}}>正解牌：</span>
+          <Tile {...answer} state="answer-hi" disabled/>
+          <span style={{fontSize:13,color:'var(--green)',fontWeight:700}}>✓</span>
+        </div>}
       </div>
-
-      {/* ステップ0: 手牌 */}
-      {step===0&&(
-        <div className="card fade-up">
-          <div className="section-title">手牌を入力（最大13牌）</div>
-          <TilePalette onAdd={addHand} maxCount={13} currentCount={hand.length}/>
-          <div className="btn-row" style={{marginTop:14}}>
-            <button className="btn sm danger" onClick={()=>setHand([])}>クリア</button>
-            <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(1)}>次へ →</button>
-          </div>
+      {step===0&&<div className="card fade-up">
+        <div className="sec-title">手牌を入力（最大13牌）</div>
+        <TilePalette onAdd={addHand} maxCount={13} currentCount={hand.length}/>
+        <div className="btn-row" style={{marginTop:14}}>
+          <button className="btn sm danger" onClick={()=>setHand([])}>クリア</button>
+          <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(1)}>次へ →</button>
         </div>
-      )}
-
-      {/* ステップ1: ツモ */}
-      {step===1&&(
-        <div className="card fade-up">
-          <div className="section-title">ツモ牌（省略可）</div>
-          <TilePalette onAdd={t=>setTsumo(t)} maxCount={1} currentCount={tsumo?1:0}/>
-          {tsumo&&<button className="btn sm danger" style={{marginTop:10}} onClick={()=>setTsumo(null)}>ツモ牌をクリア</button>}
-          <div className="btn-row" style={{marginTop:14}}>
-            <button className="btn sm" onClick={()=>setStep(0)}>← 戻る</button>
-            <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(2)}>次へ →</button>
-          </div>
+      </div>}
+      {step===1&&<div className="card fade-up">
+        <div className="sec-title">ツモ牌（省略可）</div>
+        <TilePalette onAdd={t=>setTsumo(t)} maxCount={1} currentCount={tsumo?1:0}/>
+        {tsumo&&<button className="btn sm danger" style={{marginTop:10}} onClick={()=>setTsumo(null)}>ツモ牌をクリア</button>}
+        <div className="btn-row" style={{marginTop:14}}>
+          <button className="btn sm" onClick={()=>setStep(0)}>← 戻る</button>
+          <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(2)}>次へ →</button>
         </div>
-      )}
-
-      {/* ステップ2: 正解牌 */}
-      {step===2&&(
-        <div className="card fade-up">
-          <div className="section-title">正解牌を選択</div>
-          <div style={{display:'flex',gap:4,marginBottom:10,flexWrap:'wrap'}}>
-            {ANSWER_SUIT_DEFS.map(s=>(
-              <button key={s.key} onClick={()=>setAnswerSuit(s.key)} style={{
-                padding:'9px 14px',border:`1px solid ${answerSuit===s.key?'var(--accent)':'var(--border)'}`,
-                borderRadius:'var(--r)',background:answerSuit===s.key?'var(--accent)':'var(--bg3)',
-                color:answerSuit===s.key?'#000':'var(--text2)',cursor:'pointer',fontSize:13,
-                fontFamily:'inherit',fontWeight:700,
-              }}>{s.label}</button>
+      </div>}
+      {step===2&&<div className="card fade-up">
+        <div className="sec-title">正解牌を選択</div>
+        <div style={{display:'flex',gap:4,marginBottom:10,flexWrap:'wrap'}}>
+          {SUIT_DEFS.map(s=>(
+            <button key={s.key} onClick={()=>setAnsSuit(s.key)} style={{
+              padding:'9px 14px',border:`1px solid ${ansSuit===s.key?'var(--accent)':'var(--border)'}`,
+              borderRadius:'var(--r)',background:ansSuit===s.key?'var(--accent)':'var(--bg3)',
+              color:ansSuit===s.key?'#1a1208':'var(--text2)',cursor:'pointer',fontSize:13,fontFamily:'inherit',fontWeight:700,
+            }}>{s.label}</button>
+          ))}
+        </div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6,padding:8,background:'var(--bg)',borderRadius:'var(--r)',border:'1px solid var(--border)'}}>
+          {ansCur&&(ansCur.items||ansCur.nums.map(n=>({num:n}))).map(item=>(
+            <Tile key={item.num} suit={ansSuit} num={item.num} label={item.label}
+              state={answer?.num===item.num&&answer?.suit===ansSuit?'answer-hi':''}
+              onClick={()=>setAnswer({suit:ansSuit,num:item.num,label:item.label})}/>
+          ))}
+        </div>
+        <div className="btn-row" style={{marginTop:14}}>
+          <button className="btn sm" onClick={()=>setStep(1)}>← 戻る</button>
+          <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(3)}>次へ →</button>
+        </div>
+      </div>}
+      {step===3&&<div className="card fade-up">
+        <div className="sec-title">解説とカテゴリ</div>
+        <div className="form-group">
+          <label>セオリー・解説メモ</label>
+          <textarea rows={4} value={memo} onChange={e=>setMemo(e.target.value)}
+            placeholder="例：孤立字牌より両面ターツを優先。三麻では打点インフレのため役牌トイツの価値が高い。"/>
+        </div>
+        <div className="form-group">
+          <label>カテゴリタグ（複数可）</label>
+          <div className="tags-wrap">
+            {CATEGORIES.map(c=>(
+              <div key={c} className={`tag ${tags.includes(c)?'on':'off'}`}
+                onClick={()=>setTags(prev=>prev.includes(c)?prev.filter(t=>t!==c):[...prev,c])}>{c}</div>
             ))}
           </div>
-          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-            {curAns&&(curAns.items||curAns.nums.map(n=>({num:n}))).map(item=>(
-              <Tile key={item.num} suit={answerSuit} num={item.num} label={item.label}
-                state={answer?.num===item.num&&answer?.suit===answerSuit?'answer-hi':''}
-                onClick={()=>setAnswer({suit:answerSuit,num:item.num,label:item.label})}/>
-            ))}
-          </div>
-          <div className="btn-row" style={{marginTop:14}}>
-            <button className="btn sm" onClick={()=>setStep(1)}>← 戻る</button>
-            <button className="btn primary" style={{marginLeft:'auto'}} onClick={()=>setStep(3)}>次へ →</button>
-          </div>
         </div>
-      )}
-
-      {/* ステップ3: 解説 */}
-      {step===3&&(
-        <div className="card fade-up">
-          <div className="section-title">解説とカテゴリ</div>
-          <div className="form-group">
-            <label>セオリー・解説メモ</label>
-            <textarea rows={4} value={memo} onChange={e=>setMemo(e.target.value)}
-              placeholder="例：孤立字牌より両面ターツを優先。三麻は打点インフレのため役牌トイツの価値が高い。"/>
-          </div>
-          <div className="form-group">
-            <label>カテゴリタグ（複数可）</label>
-            <div className="tags-wrap">
-              {CATEGORIES.map(c=>(
-                <div key={c} className={`tag ${tags.includes(c)?'on':'off'}`}
-                  onClick={()=>setTags(prev=>prev.includes(c)?prev.filter(t=>t!==c):[...prev,c])}>
-                  {c}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="btn-row" style={{marginTop:16}}>
-            <button className="btn sm" onClick={()=>setStep(2)}>← 戻る</button>
-            <button className="btn primary lg btn-full" onClick={handleSave}>💾 問題を保存</button>
-          </div>
+        <div className="btn-row" style={{marginTop:16}}>
+          <button className="btn sm" onClick={()=>setStep(2)}>← 戻る</button>
+          <button className="btn primary lg btn-full" onClick={handleSave}>💾 問題を保存</button>
         </div>
-      )}
+      </div>}
     </div>
   );
 }
 
-// ===== 問題帳 =====
 function ProblemListScreen({problems,onDelete,onToggleReview}){
   const [filter,setFilter]=useState('all');
   const [catFilter,setCatFilter]=useState('');
@@ -502,8 +429,7 @@ function ProblemListScreen({problems,onDelete,onToggleReview}){
         </select>
       </div>
       <div style={{fontSize:12,color:'var(--text3)',marginBottom:10}}>{filtered.length}件</div>
-      {filtered.length===0
-        ?<div className="empty"><div className="empty-icon">📋</div><div className="empty-text">問題がありません</div></div>
+      {filtered.length===0?<div className="empty"><div className="empty-icon">📋</div><div className="empty-text">問題がありません</div></div>
         :filtered.map(p=>{
           const acc=p.totalCount>0?Math.round(p.correctCount/p.totalCount*100):null;
           return(
@@ -512,9 +438,7 @@ function ProblemListScreen({problems,onDelete,onToggleReview}){
                 <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
                   {p.tags.map(t=><span key={t} className="badge blue">{t}</span>)}
                   {p.reviewFlag&&<span className="badge gold">復習</span>}
-                  {acc!==null
-                    ?<span className={`badge ${acc>=70?'green':acc>=40?'gray':'red'}`}>{acc}%</span>
-                    :<span className="badge gray">未練習</span>}
+                  {acc!==null?<span className={`badge ${acc>=70?'green':acc>=40?'gray':'red'}`}>{acc}%</span>:<span className="badge gray">未練習</span>}
                 </div>
                 <div style={{display:'flex',gap:6}}>
                   <button className="btn sm gold" onClick={()=>onToggleReview(p.id)}>{p.reviewFlag?'★':'☆'}</button>
@@ -523,129 +447,127 @@ function ProblemListScreen({problems,onDelete,onToggleReview}){
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:3,alignItems:'flex-end'}}>
                 {p.hand.map((t,i)=><Tile key={t.id??i} {...t} size="xs" disabled/>)}
-                {p.tsumo&&<><div className="tile-sep" style={{height:40}}/><Tile {...p.tsumo} size="xs" disabled/></>}
+                {p.tsumo&&<><div className="tile-sep-el" style={{height:40}}/><Tile {...p.tsumo} size="xs" disabled/></>}
               </div>
               {p.memo&&<div style={{fontSize:12,color:'var(--text2)',marginTop:8,lineHeight:1.6,overflow:'hidden',display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{p.memo}</div>}
             </div>
           );
-        })
-      }
+        })}
     </div>
   );
 }
 
-// ===== トレーニング =====
+// ★ バグ修正：TrainingScreenを完全に独立したコンポーネントとして定義
+// 内部stateがApp全体のre-renderに引きずられないよう、
+// tab切り替えでもこのコンポーネントはアンマウントしない（MainContentで常に保持）
 function TrainingScreen({problems,onResult,onAddReview}){
-  const TOTAL=10, TIME=30;
+  const TOTAL=10,TIME=30;
   const [phase,setPhase]=useState('ready');
   const [queue,setQueue]=useState([]);
   const [idx,setIdx]=useState(0);
   const [timeLeft,setTimeLeft]=useState(TIME);
-  const [judged,setJudged]=useState(null); // null | 'correct' | 'wrong' | 'timeout'
+  const [judged,setJudged]=useState(null);
   const [selectedKey,setSelectedKey]=useState(null);
-  const [results,setResults]=useState([]);
-  const [showReviewToast,setShowReviewToast]=useState(false);
+  const [doneResults,setDoneResults]=useState([]);
+  const [toast,setToast]=useState(false);
   const timerRef=useRef(null);
   const nextRef=useRef(null);
+  // stale closure回避用ref
+  const queueRef=useRef([]);
+  const idxRef=useRef(0);
+  const collectedRef=useRef([]);
 
-  const buildQueue=useCallback(()=>{
+  const buildQueue=()=>{
     if(!problems.length)return[];
     const sorted=[...problems].sort((a,b)=>priorityScore(a)-priorityScore(b));
     const tfs=['none','color','flip','both'];
     return Array.from({length:TOTAL},(_,i)=>{
       const p=sorted[i%sorted.length];
       const tf=tfs[Math.floor(Math.random()*tfs.length)];
-      return{
-        problem:p,
-        hand:tf==='none'?p.hand:transformTiles(p.hand,tf),
+      return{problem:p,hand:tf==='none'?p.hand:transformTiles(p.hand,tf),
         tsumo:p.tsumo&&tf!=='none'?transformTile(p.tsumo,tf):p.tsumo,
-        answer:tf==='none'?p.answer:transformTile(p.answer,tf),
-        transform:tf,
-      };
+        answer:tf==='none'?p.answer:transformTile(p.answer,tf),transform:tf};
     });
-  },[problems]);
-
-  const startTraining=()=>{
-    const q=buildQueue();
-    if(!q.length)return;
-    setQueue(q);setIdx(0);setResults([]);setPhase('question');
-    setJudged(null);setSelectedKey(null);setTimeLeft(TIME);
   };
 
-  // タイマー
+  const startTraining=()=>{
+    clearInterval(timerRef.current);clearTimeout(nextRef.current);
+    const q=buildQueue();
+    if(!q.length)return;
+    queueRef.current=q;idxRef.current=0;collectedRef.current=[];
+    setQueue(q);setIdx(0);setJudged(null);setSelectedKey(null);
+    setTimeLeft(TIME);setDoneResults([]);setPhase('question');
+  };
+
+  // タイマー：phaseとidxをキーにしてリセット
   useEffect(()=>{
-    if(phase!=='question'||judged)return;
+    if(phase!=='question'){clearInterval(timerRef.current);return;}
+    setTimeLeft(TIME);
     clearInterval(timerRef.current);
     timerRef.current=setInterval(()=>{
-      setTimeLeft(prev=>{
-        if(prev<=1){clearInterval(timerRef.current);handleTimeout();return 0;}
-        return prev-1;
+      setTimeLeft(t=>{
+        if(t<=1){clearInterval(timerRef.current);fireTimeout();return 0;}
+        return t-1;
       });
     },1000);
     return()=>clearInterval(timerRef.current);
-  },[phase,idx,judged]);
+  },[phase,idx]);// eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleTimeout=()=>{
-    clearInterval(timerRef.current);
+  const fireTimeout=()=>{
+    const cur=queueRef.current[idxRef.current];
+    if(cur)onResult(cur.problem.id,false);
     setJudged('timeout');
-    setSelectedKey(null);
-    const cur=queue[idx];
-    onResult(cur.problem.id,false);
-    scheduleNext([...results,{isCorrect:false}]);
+    goNext(false);
   };
 
   const handleTap=(tile)=>{
-    if(judged)return;
+    if(judged!==null)return;
     clearInterval(timerRef.current);
-    const cur=queue[idx];
-    const ansKey=tileKey(cur.answer);
-    const tapKey=tileKey(tile);
-    const isCorrect=tapKey===ansKey;
-    setSelectedKey(tapKey);
+    const cur=queueRef.current[idxRef.current];
+    if(!cur)return;
+    const isCorrect=tileKey(tile)===tileKey(cur.answer);
+    setSelectedKey(tileKey(tile));
     setJudged(isCorrect?'correct':'wrong');
     onResult(cur.problem.id,isCorrect);
-    scheduleNext([...results,{problem:cur.problem,transform:cur.transform,isCorrect}]);
+    goNext(isCorrect);
   };
 
-  const scheduleNext=(newResults)=>{
+  const goNext=(isCorrect)=>{
     clearTimeout(nextRef.current);
+    collectedRef.current=[...collectedRef.current,{isCorrect}];
+    const collected=[...collectedRef.current];
     nextRef.current=setTimeout(()=>{
-      if(newResults.length>=TOTAL){
-        setResults(newResults);setPhase('done');
+      if(collected.length>=TOTAL){
+        setDoneResults(collected);setPhase('done');
       } else {
-        setIdx(i=>i+1);setJudged(null);setSelectedKey(null);setTimeLeft(TIME);
+        idxRef.current=idxRef.current+1;
+        setIdx(idxRef.current);
+        setJudged(null);setSelectedKey(null);
       }
     },1600);
   };
 
-  // クリーンアップ
   useEffect(()=>()=>{clearInterval(timerRef.current);clearTimeout(nextRef.current);},[]);
 
-  // 復習追加トースト
-  const addReviewWithToast=(id)=>{
-    onAddReview(id);
-    setShowReviewToast(true);
-    setTimeout(()=>setShowReviewToast(false),2000);
+  const addReviewWithToast=id=>{
+    onAddReview(id);setToast(true);
+    setTimeout(()=>setToast(false),2000);
   };
 
-  if(phase==='ready')return(
+  if(phase==='ready') return(
     <div className="fade-up" style={{textAlign:'center',padding:'48px 16px'}}>
-      <div style={{fontSize:56,marginBottom:16}}>🀄</div>
-      <div style={{fontSize:22,fontWeight:900,marginBottom:10}}>道場へ入門する</div>
+      <div style={{fontSize:60,marginBottom:16}}>🀄</div>
+      <div style={{fontSize:24,fontWeight:900,marginBottom:10,fontFamily:"'Noto Serif JP',serif",letterSpacing:'.05em'}}>道場へ入門する</div>
       <div style={{fontSize:14,color:'var(--text2)',lineHeight:1.9,marginBottom:32}}>
-        {TOTAL}問出題・1問{TIME}秒の制限時間<br/>
-        正解率が低い苦手問題を優先出題<br/>
-        牌をタップして正解を選択
+        {TOTAL}問出題・1問{TIME}秒の制限時間<br/>正解率が低い苦手問題を優先出題<br/>切りたい牌をタップして回答
       </div>
-      {problems.length===0
-        ?<div style={{color:'var(--text3)',fontSize:14}}>まず問題を登録してください</div>
-        :<button className="btn primary lg btn-full" onClick={startTraining} style={{maxWidth:280,margin:'0 auto'}}>稽古開始</button>
-      }
+      {problems.length===0?<div style={{color:'var(--text3)',fontSize:14}}>まず問題を登録してください</div>
+        :<button className="btn primary lg btn-full" onClick={startTraining} style={{maxWidth:280,margin:'0 auto'}}>稽古開始</button>}
     </div>
   );
 
   if(phase==='done'){
-    const correct=results.filter(r=>r.isCorrect).length;
+    const correct=doneResults.filter(r=>r.isCorrect).length;
     const score=correct*10;
     const col=score>=70?'var(--green)':score>=40?'var(--gold)':'var(--red)';
     return(
@@ -656,19 +578,6 @@ function TrainingScreen({problems,onResult,onAddReview}){
         <div style={{height:8,background:'var(--bg3)',borderRadius:4,overflow:'hidden',maxWidth:280,margin:'0 auto 28px'}}>
           <div style={{width:`${score}%`,height:'100%',background:col,borderRadius:4,transition:'width .8s ease'}}/>
         </div>
-        {/* 結果一覧 */}
-        <div style={{textAlign:'left',marginBottom:24}}>
-          {results.map((r,i)=>(
-            <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-              <span style={{fontSize:20,width:28,flexShrink:0}}>{r.isCorrect?'✅':'❌'}</span>
-              <div style={{flex:1,display:'flex',gap:3,flexWrap:'wrap',alignItems:'flex-end'}}>
-                {r.problem.hand.slice(0,6).map((t,j)=><Tile key={j} {...t} size="xs" disabled/>)}
-                {r.problem.hand.length>6&&<span style={{fontSize:10,color:'var(--text3)',alignSelf:'flex-end'}}>+{r.problem.hand.length-6}</span>}
-              </div>
-              {r.transform!=='none'&&<span className="badge gray" style={{fontSize:10}}>{transformLabel(r.transform)}</span>}
-            </div>
-          ))}
-        </div>
         <div className="btn-row" style={{justifyContent:'center'}}>
           <button className="btn primary lg" onClick={startTraining}>もう一周</button>
           <button className="btn lg" onClick={()=>setPhase('ready')}>終了</button>
@@ -677,35 +586,24 @@ function TrainingScreen({problems,onResult,onAddReview}){
     );
   }
 
-  if(phase!=='question')return null;
   const cur=queue[idx];
-  if(!cur)return null;
+  if(!cur||phase!=='question')return null;
   const ansKey=tileKey(cur.answer);
   const circ=2*Math.PI*23;
   const offset=circ*(1-timeLeft/TIME);
   const tc=timeLeft<=10?'var(--red)':timeLeft<=20?'var(--gold)':'var(--green)';
 
   return(
-    <div className="fade-up">
-      {/* 復習トースト */}
-      {showReviewToast&&(
-        <div style={{position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',
-          background:'var(--gold)',color:'#000',padding:'10px 20px',borderRadius:'var(--r)',
-          fontWeight:700,fontSize:13,zIndex:999,animation:'popIn .25s ease'}}>
-          ☆ 復習リストに追加しました
-        </div>
-      )}
-
-      {/* ヘッダー */}
+    <div>
+      {toast&&<div style={{position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',
+        background:'var(--gold)',color:'#1a1208',padding:'10px 20px',borderRadius:'var(--r)',
+        fontWeight:700,fontSize:13,zIndex:999,animation:'popIn .25s ease'}}>☆ 復習リストに追加しました</div>}
       <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
         <div style={{flex:1}}>
           <div style={{fontSize:12,color:'var(--text2)',marginBottom:4}}>問題 {idx+1} / {TOTAL}</div>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{width:`${(idx/TOTAL)*100}%`,background:'var(--accent)'}}/>
-          </div>
+          <div className="progress-bar"><div className="progress-fill" style={{width:`${(idx/TOTAL)*100}%`,background:'var(--accent)'}}/></div>
         </div>
-        {cur.transform!=='none'&&<span className="badge blue">{transformLabel(cur.transform)}</span>}
-        {/* タイマー */}
+        {cur.transform!=='none'&&<span className="badge blue">{tfLabel(cur.transform)}</span>}
         <div className="timer-ring">
           <svg width="54" height="54" viewBox="0 0 54 54">
             <circle cx="27" cy="27" r="23" fill="none" stroke="var(--bg3)" strokeWidth="4"/>
@@ -716,64 +614,35 @@ function TrainingScreen({problems,onResult,onAddReview}){
           <div className="timer-num" style={{color:tc}}>{timeLeft}</div>
         </div>
       </div>
-
       <div className="card">
-        <div style={{fontSize:17,fontWeight:900,textAlign:'center',marginBottom:4}}>何を切る？</div>
-        <div style={{fontSize:12,color:'var(--text2)',textAlign:'center',marginBottom:20}}>
-          {judged?'':'切りたい牌をタップ'}
-        </div>
-
-        {/* 手牌 */}
+        <div style={{fontSize:18,fontWeight:900,textAlign:'center',marginBottom:4,fontFamily:"'Noto Serif JP',serif"}}>何を切る？</div>
+        <div style={{fontSize:12,color:'var(--text2)',textAlign:'center',marginBottom:20}}>{judged?'':'切りたい牌をタップ'}</div>
         <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',gap:6,marginBottom:16,alignItems:'flex-end'}}>
           {cur.hand.map((t,i)=>{
-            const tk=tileKey(t);
-            const isAns=tk===ansKey;
-            const isSel=tk===selectedKey;
+            const tk=tileKey(t),isAns=tk===ansKey,isSel=tk===selectedKey;
             let state='';
-            if(judged){
-              if(isAns) state='correct';
-              else if(isSel) state='wrong';
-              else state='dimmed';
-            }
-            return<Tile key={t.id??i} {...t} state={state} disabled={!!judged} onClick={()=>handleTap(t)}/>;
+            if(judged!==null){if(isAns)state='correct';else if(isSel)state='wrong';else state='dimmed';}
+            return<Tile key={t.id??i} {...t} state={state} disabled={judged!==null} onClick={()=>handleTap(t)}/>;
           })}
           {cur.tsumo&&(()=>{
-            const tk=tileKey(cur.tsumo);
-            const isAns=tk===ansKey;
-            const isSel=tk===selectedKey;
+            const tk=tileKey(cur.tsumo),isAns=tk===ansKey,isSel=tk===selectedKey;
             let state='';
-            if(judged){
-              if(isAns) state='correct';
-              else if(isSel) state='wrong';
-              else state='dimmed';
-            }
-            return<><div className="tile-sep"/><Tile {...cur.tsumo} state={state} disabled={!!judged} onClick={()=>handleTap(cur.tsumo)}/></>;
+            if(judged!==null){if(isAns)state='correct';else if(isSel)state='wrong';else state='dimmed';}
+            return<><div className="tile-sep-el"/><Tile {...cur.tsumo} state={state} disabled={judged!==null} onClick={()=>handleTap(cur.tsumo)}/></>;
           })()}
         </div>
-
-        {/* フィードバック */}
-        {judged&&(
-          <div className={`feedback ${judged==='correct'?'correct-fb':'wrong-fb'}`}>
-            <div className="feedback-icon">{judged==='correct'?'🎯':judged==='timeout'?'⏰':'💦'}</div>
-            <div className="feedback-title" style={{color:judged==='correct'?'var(--green2)':'var(--red2)'}}>
+        {judged!==null&&(
+          <div className={`feedback ${judged==='correct'?'ok':'ng'}`}>
+            <div className="fb-icon">{judged==='correct'?'🎯':judged==='timeout'?'⏰':'💦'}</div>
+            <div className="fb-title" style={{color:judged==='correct'?'var(--green2)':'var(--red2)'}}>
               {judged==='correct'?'正解！':judged==='timeout'?'時間切れ':'不正解'}
             </div>
-            {judged!=='correct'&&(
-              <div style={{margin:'8px 0',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
-                <span style={{fontSize:12,color:'var(--text2)'}}>正解：</span>
-                <Tile {...cur.answer} state="answer-hi" size="sm" disabled/>
-              </div>
-            )}
-            {cur.problem.memo&&(
-              <div className="feedback-sub" style={{marginTop:8,textAlign:'left',background:'rgba(0,0,0,.2)',borderRadius:'var(--r)',padding:'10px 12px'}}>
-                {cur.problem.memo}
-              </div>
-            )}
-            {judged!=='correct'&&(
-              <button className="btn gold sm" style={{marginTop:12}} onClick={()=>addReviewWithToast(cur.problem.id)}>
-                ☆ 復習リストへ
-              </button>
-            )}
+            {judged!=='correct'&&<div style={{margin:'8px 0',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+              <span style={{fontSize:12,color:'var(--text2)'}}>正解：</span>
+              <Tile {...cur.answer} state="answer-hi" size="sm" disabled/>
+            </div>}
+            {cur.problem.memo&&<div className="fb-sub" style={{marginTop:8,textAlign:'left',background:'rgba(0,0,0,.25)',borderRadius:'var(--r)',padding:'10px 12px'}}>{cur.problem.memo}</div>}
+            {judged!=='correct'&&<button className="btn gold sm" style={{marginTop:12}} onClick={()=>addReviewWithToast(cur.problem.id)}>☆ 復習リストへ</button>}
             <div style={{fontSize:11,color:'var(--text3)',marginTop:10}}>次の問題へ自動で移動します...</div>
           </div>
         )}
@@ -782,48 +651,29 @@ function TrainingScreen({problems,onResult,onAddReview}){
   );
 }
 
-// ===== 分析 =====
 function AnalyticsScreen({problems,dailyLog,onImport}){
   const practiced=problems.filter(p=>p.totalCount>0);
   const totalQ=problems.reduce((s,p)=>s+p.totalCount,0);
   const totalC=problems.reduce((s,p)=>s+p.correctCount,0);
   const acc=totalQ>0?Math.round(totalC/totalQ*100):0;
-
   const tagStats=CATEGORIES.map(cat=>{
     const ps=problems.filter(p=>p.tags.includes(cat)&&p.totalCount>0);
     if(!ps.length)return null;
-    const c=ps.reduce((s,p)=>s+p.correctCount,0);
-    const t=ps.reduce((s,p)=>s+p.totalCount,0);
+    const c=ps.reduce((s,p)=>s+p.correctCount,0),t=ps.reduce((s,p)=>s+p.totalCount,0);
     return{cat,acc:Math.round(c/t*100),n:ps.length};
   }).filter(Boolean).sort((a,b)=>a.acc-b.acc);
-
-  // カレンダー（105日 = 15週×7日）
   const days=lastNDays(105);
-  // 週ごとに分割
-  const weeks=[];
-  for(let i=0;i<days.length;i+=7)weeks.push(days.slice(i,i+7));
-
-  // エクスポート
+  const weeks=[];for(let i=0;i<days.length;i+=7)weeks.push(days.slice(i,i+7));
   const exportData=()=>{
-    const blob=new Blob([JSON.stringify({version:3,problems,dailyLog},null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=`sanma_${todayKey()}.json`;a.click();
+    const blob=new Blob([JSON.stringify({version:4,problems,dailyLog},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`sanma_${todayKey()}.json`;a.click();
   };
   const importData=e=>{
     const f=e.target.files[0];if(!f)return;
     const r=new FileReader();
-    r.onload=ev=>{
-      try{
-        const d=JSON.parse(ev.target.result);
-        if(!d.problems)return alert('ファイル形式が正しくありません');
-        onImport(d);
-        alert(`✅ ${d.problems.length}件の問題をインポートしました`);
-      }catch{alert('ファイル形式が正しくありません');}
-    };
-    r.readAsText(f);
-    e.target.value='';
+    r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.problems)return alert('形式エラー');onImport(d);alert(`✅ ${d.problems.length}件インポートしました`);}catch{alert('形式エラー');}};
+    r.readAsText(f);e.target.value='';
   };
-
   return(
     <div className="fade-up">
       <div className="stat-grid" style={{marginBottom:14}}>
@@ -832,137 +682,89 @@ function AnalyticsScreen({problems,dailyLog,onImport}){
         <div className="stat-box"><div className="stat-num">{acc}<span style={{fontSize:16}}>%</span></div><div className="stat-lbl">総合正解率</div></div>
         <div className="stat-box"><div className="stat-num">{totalQ}</div><div className="stat-lbl">総解答数</div></div>
       </div>
-
-      {/* カレンダー */}
       <div className="card" style={{marginBottom:14}}>
-        <div className="section-title">学習カレンダー（過去15週）</div>
-        <div className="cal-wrap">
-          <div className="cal-grid">
-            {weeks.map((week,wi)=>(
-              <div key={wi} className="cal-col">
-                {week.map(d=>{
-                  const v=dailyLog[d]||0;
-                  const lv=v===0?0:v<=3?1:v<=8?2:v<=15?3:4;
-                  return<div key={d} className={`cal-cell lv${lv}`} title={`${d}: ${v}問`}/>;
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
+        <div className="sec-title">学習カレンダー（過去15週）</div>
+        <div className="cal-wrap"><div className="cal-grid">
+          {weeks.map((week,wi)=><div key={wi} className="cal-col">
+            {week.map(d=>{const v=dailyLog[d]||0;const lv=v===0?0:v<=3?1:v<=8?2:v<=15?3:4;return<div key={d} className={`cal-cell lv${lv}`} title={`${d}: ${v}問`}/>;})}
+          </div>)}
+        </div></div>
         <div style={{display:'flex',gap:4,alignItems:'center',marginTop:8}}>
           <span style={{fontSize:11,color:'var(--text3)'}}>少</span>
           {[0,1,2,3,4].map(l=><div key={l} className={`cal-cell lv${l}`}/>)}
           <span style={{fontSize:11,color:'var(--text3)'}}>多</span>
         </div>
       </div>
-
-      {/* タグ別 */}
       <div className="card" style={{marginBottom:14}}>
-        <div className="section-title">カテゴリ別正解率（低い順）</div>
-        {tagStats.length===0
-          ?<div style={{color:'var(--text3)',fontSize:13}}>データがありません</div>
-          :<div className="bar-chart">
-            {tagStats.map(({cat,acc:a,n})=>(
-              <div key={cat} className="bar-row2">
-                <div className="bar-label2">{cat}</div>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{width:`${a}%`,background:a>=70?'var(--green)':a>=40?'var(--gold)':'var(--red)'}}>{a}%</div>
-                </div>
-                <div className="bar-val2">{n}問</div>
-              </div>
-            ))}
-          </div>
-        }
+        <div className="sec-title">カテゴリ別正解率（低い順）</div>
+        {tagStats.length===0?<div style={{color:'var(--text3)',fontSize:13}}>データがありません</div>
+          :<div className="bar-chart">{tagStats.map(({cat,acc:a,n})=>(
+            <div key={cat} className="bar-row">
+              <div className="bar-lbl">{cat}</div>
+              <div className="bar-track"><div className="bar-fill" style={{width:`${a}%`,background:a>=70?'var(--green)':a>=40?'var(--gold)':'var(--red)'}}>{a}%</div></div>
+              <div className="bar-val">{n}問</div>
+            </div>
+          ))}</div>}
       </div>
-
-      {/* データ管理 */}
       <div className="card">
-        <div className="section-title">データ管理</div>
+        <div className="sec-title">データ管理</div>
+        <div style={{fontSize:13,color:'var(--text2)',marginBottom:12,lineHeight:1.7}}>
+          バージョン更新時は「エクスポート」→新版で「インポート」してください。
+        </div>
         <div className="btn-row">
           <button className="btn sm" onClick={exportData}>📤 エクスポート</button>
-          <button className="btn sm" onClick={()=>document.getElementById('imp').click()}>📥 インポート</button>
-          <input type="file" id="imp" accept=".json" style={{display:'none'}} onChange={importData}/>
+          <button className="btn sm" onClick={()=>document.getElementById('imp-file').click()}>📥 インポート</button>
+          <input type="file" id="imp-file" accept=".json" style={{display:'none'}} onChange={importData}/>
         </div>
       </div>
     </div>
   );
 }
 
-// ===== メインアプリ =====
+// ★ バグ修正の核心：MainContentを独立した関数コンポーネントとして定義
+// App内のインライン関数「Content」にしないことで、tabが変わっても
+// TrainingScreenのstateがリセットされなくなる
+function MainContent({tab,problems,dailyLog,onResult,onAddReview,onSaveProblem,onDelete,onToggleReview,onImport}){
+  if(tab==='train') return <TrainingScreen problems={problems} onResult={onResult} onAddReview={onAddReview}/>;
+  if(tab==='add')   return <AddProblemScreen onSave={onSaveProblem}/>;
+  if(tab==='list')  return <ProblemListScreen problems={problems} onDelete={onDelete} onToggleReview={onToggleReview}/>;
+  if(tab==='analytics') return <AnalyticsScreen problems={problems} dailyLog={dailyLog} onImport={onImport}/>;
+  return null;
+}
+
 function App(){
   const [tab,setTab]=useState('train');
   const [problems,setProblems]=useState(()=>LS.get('sanma_problems',[]));
   const [dailyLog,setDailyLog]=useState(()=>LS.get('sanma_daily',{}));
-
   useEffect(()=>{LS.set('sanma_problems',problems);},[problems]);
   useEffect(()=>{LS.set('sanma_daily',dailyLog);},[dailyLog]);
-
   const handleImport=d=>{
-    setProblems(prev=>{
-      const map=new Map(prev.map(p=>[p.id,p]));
-      (d.problems||[]).forEach(p=>map.set(p.id,p));
-      return [...map.values()];
-    });
-    if(d.dailyLog){
-      setDailyLog(prev=>{
-        const merged={...prev};
-        Object.entries(d.dailyLog).forEach(([k,v])=>{merged[k]=Math.max(merged[k]||0,v);});
-        return merged;
-      });
-    }
+    setProblems(prev=>{const m=new Map(prev.map(p=>[p.id,p]));(d.problems||[]).forEach(p=>m.set(p.id,p));return[...m.values()];});
+    if(d.dailyLog)setDailyLog(prev=>{const m={...prev};Object.entries(d.dailyLog).forEach(([k,v])=>{m[k]=Math.max(m[k]||0,v);});return m;});
   };
-
   const saveProblem=p=>setProblems(prev=>[p,...prev]);
   const deleteProblem=id=>setProblems(prev=>prev.filter(p=>p.id!==id));
   const toggleReview=id=>setProblems(prev=>prev.map(p=>p.id===id?{...p,reviewFlag:!p.reviewFlag}:p));
   const addReview=id=>setProblems(prev=>prev.map(p=>p.id===id?{...p,reviewFlag:true}:p));
   const recordResult=(id,isCorrect)=>{
     setProblems(prev=>prev.map(p=>p.id===id?{...p,correctCount:p.correctCount+(isCorrect?1:0),totalCount:p.totalCount+1}:p));
-    const today=todayKey();
-    setDailyLog(prev=>({...prev,[today]:(prev[today]||0)+1}));
+    setDailyLog(prev=>({...prev,[todayKey()]:(prev[todayKey()]||0)+1}));
   };
-
-  const NAV=[
-    {key:'train',icon:'⚔️',label:'道場'},
-    {key:'add',icon:'➕',label:'登録'},
-    {key:'list',icon:'📋',label:'問題帳'},
-    {key:'analytics',icon:'📊',label:'分析'},
-  ];
-
-  const Content=()=>(
-    <div className="main">
-      {tab==='train'&&<TrainingScreen problems={problems} onResult={recordResult} onAddReview={addReview}/>}
-      {tab==='add'&&<AddProblemScreen onSave={p=>{saveProblem(p);setTab('list');}}/>}
-      {tab==='list'&&<ProblemListScreen problems={problems} onDelete={deleteProblem} onToggleReview={toggleReview}/>}
-      {tab==='analytics'&&<AnalyticsScreen problems={problems} dailyLog={dailyLog} onImport={handleImport}/>}
-    </div>
-  );
-
+  const NAV=[{key:'train',ic:'⚔️',lb:'道場'},{key:'add',ic:'➕',lb:'登録'},{key:'list',ic:'📋',lb:'問題帳'},{key:'analytics',ic:'📊',lb:'分析'}];
+  const cp={tab,problems,dailyLog,onResult:recordResult,onAddReview:addReview,
+    onSaveProblem:p=>{saveProblem(p);setTab('list');},onDelete:deleteProblem,onToggleReview:toggleReview,onImport:handleImport};
   return(
     <div className="app">
-      {/* PC: サイドナビ＋コンテンツ */}
       <div className="pc-layout">
         <div className="side-nav">
-          <div className="side-nav-logo">三麻<span>道場</span></div>
-          {NAV.map(n=>(
-            <button key={n.key} className={`side-nav-btn ${tab===n.key?'active':''}`} onClick={()=>setTab(n.key)}>
-              <span className="icon">{n.icon}</span>{n.label}
-            </button>
-          ))}
-          <div style={{marginTop:'auto',fontSize:11,color:'var(--text3)',padding:'8px 12px',lineHeight:1.6}}>
-            データはブラウザに<br/>自動保存されます
-          </div>
+          <div className="side-logo">三麻<span>道場</span></div>
+          {NAV.map(n=><button key={n.key} className={`snb ${tab===n.key?'active':''}`} onClick={()=>setTab(n.key)}><span className="ic">{n.ic}</span>{n.lb}</button>)}
+          <div style={{marginTop:'auto',fontSize:11,color:'var(--text3)',padding:'8px 12px',lineHeight:1.7}}>データはブラウザに<br/>自動保存されます</div>
         </div>
-        <div className="content-area"><Content/></div>
+        <div className="content-area"><div className="main"><MainContent {...cp}/></div></div>
       </div>
-
-      {/* スマホ: ボトムナビ */}
       <nav className="bottom-nav">
-        {NAV.map(n=>(
-          <button key={n.key} className={`bottom-nav-btn ${tab===n.key?'active':''}`} onClick={()=>setTab(n.key)}>
-            <span className="icon">{n.icon}</span>{n.label}
-          </button>
-        ))}
+        {NAV.map(n=><button key={n.key} className={`bnb ${tab===n.key?'active':''}`} onClick={()=>setTab(n.key)}><span className="ic">{n.ic}</span>{n.lb}</button>)}
       </nav>
     </div>
   );
