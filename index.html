@@ -202,29 +202,52 @@ function TileSVG({suit,num,label,w,h}){
       return (layouts[num]||[]).map(([x,y,r])=>dot(x,y,r));
     }
     if(suit==='sou'){
-      const bw=Math.max(W*0.12,5);
-      const bam=(x,col='#107020')=>{
-        const y1=H*0.1,y2=H*0.9,mid=(y1+y2)/2;
-        return<g key={x}>
-          <rect x={x-bw/2} y={y1} width={bw} height={y2-y1} rx={bw/2}
-            fill={col} stroke={col==='#b01010'?'#7a0808':'#0a5010'} strokeWidth="0.5"/>
-          <line x1={x-bw/2+1} y1={mid} x2={x+bw/2-1} y2={mid}
-            stroke={col==='#b01010'?'#7a0808':'#0a5010'} strokeWidth="1"/>
+      // ハンマー（鎹）形の記号を並べる本物スタイル
+      // 記号1個: 縦棒＋上下に横棒（H型）
+      const sym=(cx,cy,col,key)=>{
+        const sw=W*0.13, sh=H*0.13, st=Math.max(W*0.032,1.5);
+        return<g key={key}>
+          {/* 縦棒 */}
+          <line x1={cx} y1={cy-sh/2} x2={cx} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
+          {/* 上横棒 */}
+          <line x1={cx-sw/2} y1={cy-sh/2} x2={cx+sw/2} y2={cy-sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
+          {/* 下横棒 */}
+          <line x1={cx-sw/2} y1={cy+sh/2} x2={cx+sw/2} y2={cy+sh/2} stroke={col} strokeWidth={st} strokeLinecap="round"/>
         </g>;
       };
-      const c=W/2,p=W*0.27,p2=W*0.13;
+      const G='#107020', R='#c01010';
+      const c=W/2;
+      // 1索: 鳥＋記号1個
+      if(num===1){
+        const bx=c, by=H*0.34;
+        return<g>
+          {/* 簡略化した鳥シルエット */}
+          <ellipse cx={bx} cy={by-H*0.06} rx={W*0.18} ry={H*0.06} fill={G}/>
+          <ellipse cx={bx+W*0.14} cy={by-H*0.1} rx={W*0.08} ry={H*0.04} fill={G}/>
+          <circle cx={bx+W*0.2} cy={by-H*0.12} r={W*0.03} fill="#1a1a1a"/>
+          <path d={`M${bx-W*0.18},${by-H*0.02} Q${bx},${by+H*0.06} ${bx+W*0.18},${by-H*0.02}`} fill={G} stroke="none"/>
+          {/* 下に記号1個 */}
+          {sym(c,H*0.72,R,'s1')}
+        </g>;
+      }
+      // 2〜9索: グリッド配置
+      // 列数・行数でレイアウトを決める
       const layouts={
-        1:[[c,'#b01010']],
-        2:[[c-p2],[c+p2]],
-        3:[[c-p],[c,'#b01010'],[c+p]],
-        4:[[c-p],[c-p2],[c+p2],[c+p]],
-        5:[[c-p],[c-p2],[c,'#b01010'],[c+p2],[c+p]],
-        6:[[c-p],[c-p2],[c+p2],[c+p],[c-p*0.6],[c+p*0.6]],
-        7:[[c-p],[c-p2],[c,'#b01010'],[c+p2],[c+p],[c-p*0.7],[c+p*0.7]],
-        8:[[c-p],[c-p*0.6],[c-p*0.2],[c+p*0.2],[c+p*0.6],[c+p],[c-p*0.8],[c+p*0.8]],
-        9:[[c-p],[c-p*0.6],[c-p*0.2],[c+p*0.2],[c+p*0.6],[c+p],[c-p*0.8],[c,'#b01010'],[c+p*0.8]],
+        2:{cols:1,rows:2,pts:[[c,H*0.32],[c,H*0.68]]},
+        3:{cols:1,rows:3,pts:[[c,H*0.24],[c,H*0.5],[c,H*0.76]]},
+        4:{cols:2,rows:2,pts:[[c-W*0.18,H*0.32],[c+W*0.18,H*0.32],[c-W*0.18,H*0.68],[c+W*0.18,H*0.68]]},
+        5:{cols:2,rows:3,pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
+        6:{cols:2,rows:3,pts:[[c-W*0.18,H*0.22],[c+W*0.18,H*0.22],[c-W*0.18,H*0.5],[c+W*0.18,H*0.5],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
+        7:{cols:2,rows:4,pts:[[c-W*0.18,H*0.18],[c+W*0.18,H*0.18],[c-W*0.18,H*0.4],[c+W*0.18,H*0.4],[c,H*0.59],[c-W*0.18,H*0.78],[c+W*0.18,H*0.78]]},
+        8:{cols:2,rows:4,pts:[[c-W*0.18,H*0.17],[c+W*0.18,H*0.17],[c-W*0.18,H*0.37],[c+W*0.18,H*0.37],[c-W*0.18,H*0.57],[c+W*0.18,H*0.57],[c-W*0.18,H*0.77],[c+W*0.18,H*0.77]]},
+        9:{cols:3,rows:3,pts:[[c-W*0.22,H*0.2],[c,H*0.2],[c+W*0.22,H*0.2],[c-W*0.22,H*0.5],[c,H*0.5],[c+W*0.22,H*0.5],[c-W*0.22,H*0.8],[c,H*0.8],[c+W*0.22,H*0.8]]},
       };
-      return (layouts[num]||[]).map(([x,col])=>bam(x,col));
+      const lay=layouts[num];
+      if(!lay)return null;
+      // 5索の中央・3索の中央・7の中央を赤に
+      const redIdx={3:[1],5:[2],7:[4],9:[4]};
+      const reds=new Set(redIdx[num]||[]);
+      return lay.pts.map(([px,py],i)=>sym(px,py,reds.has(i)?R:G,i));
     }
     if(suit==='honor'){
       const col={1:'#1a1a1a',2:'#1a1a1a',3:'#1a1a1a',4:'#1a1a1a',5:'#107020',6:'#cc1a0a'}[num]||'#1a1a1a';
