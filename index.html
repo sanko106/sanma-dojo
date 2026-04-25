@@ -629,16 +629,32 @@ function TrainingScreen({problems,onResult,onAddReview}){
   const goNext=(isCorrect)=>{
     clearTimeout(nextRef.current);
     collectedRef.current=[...collectedRef.current,{isCorrect}];
+    // 正解時のみ自動遷移、不正解/時間切れはボタン待機
+    if(isCorrect){
+      const collected=[...collectedRef.current];
+      nextRef.current=setTimeout(()=>{
+        if(collected.length>=TOTAL){
+          setDoneResults(collected);setPhase('done');
+        } else {
+          idxRef.current=idxRef.current+1;
+          setIdx(idxRef.current);
+          setJudged(null);setSelectedKey(null);
+        }
+      },1000);
+    }
+    // 不正解・時間切れはadvanceToNext()を呼ぶまで待機
+  };
+
+  const advanceToNext=()=>{
+    clearTimeout(nextRef.current);
     const collected=[...collectedRef.current];
-    nextRef.current=setTimeout(()=>{
-      if(collected.length>=TOTAL){
-        setDoneResults(collected);setPhase('done');
-      } else {
-        idxRef.current=idxRef.current+1;
-        setIdx(idxRef.current);
-        setJudged(null);setSelectedKey(null);
-      }
-    },1600);
+    if(collected.length>=TOTAL){
+      setDoneResults(collected);setPhase('done');
+    } else {
+      idxRef.current=idxRef.current+1;
+      setIdx(idxRef.current);
+      setJudged(null);setSelectedKey(null);
+    }
   };
 
   useEffect(()=>()=>{clearInterval(timerRef.current);clearTimeout(nextRef.current);},[]);
@@ -736,8 +752,11 @@ function TrainingScreen({problems,onResult,onAddReview}){
               <Tile {...cur.answer} state="answer-hi" size="sm" disabled/>
             </div>}
             {cur.problem.memo&&<div className="fb-sub" style={{marginTop:8,textAlign:'left',background:'rgba(0,0,0,.25)',borderRadius:'var(--r)',padding:'10px 12px'}}>{cur.problem.memo}</div>}
-            {judged!=='correct'&&<button className="btn gold sm" style={{marginTop:12}} onClick={()=>addReviewWithToast(cur.problem.id)}>☆ 復習リストへ</button>}
-            <div style={{fontSize:11,color:'var(--text3)',marginTop:10}}>次の問題へ自動で移動します...</div>
+            {judged!=='correct'&&<div style={{display:'flex',gap:8,justifyContent:'center',marginTop:12,flexWrap:'wrap'}}>
+              <button className="btn gold sm" onClick={()=>addReviewWithToast(cur.problem.id)}>☆ 復習リストへ</button>
+              <button className="btn primary sm" onClick={advanceToNext}>次の問題へ →</button>
+            </div>}
+            {judged==='correct'&&<div style={{fontSize:11,color:'var(--text3)',marginTop:10}}>次の問題へ自動で移動します...</div>}
           </div>
         )}
       </div>
