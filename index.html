@@ -593,9 +593,10 @@ function TrainingScreen({problems,onResult,onAddReview}){
     setTimeLeft(TIME);setDoneResults([]);setPhase('question');
   };
 
-  // タイマー：phaseとidxをキーにしてリセット
+  // タイマー：judgedがnullの間だけ動かす。判定済みなら即停止
   useEffect(()=>{
     if(phase!=='question'){clearInterval(timerRef.current);return;}
+    if(judged!==null){clearInterval(timerRef.current);return;} // ★判定後は必ず止める
     setTimeLeft(TIME);
     clearInterval(timerRef.current);
     timerRef.current=setInterval(()=>{
@@ -605,7 +606,7 @@ function TrainingScreen({problems,onResult,onAddReview}){
       });
     },1000);
     return()=>clearInterval(timerRef.current);
-  },[phase,idx]);// eslint-disable-line react-hooks/exhaustive-deps
+  },[phase,idx,judged]);// judgedも依存配列に追加
 
   const fireTimeout=()=>{
     const cur=queueRef.current[idxRef.current];
@@ -870,7 +871,17 @@ function App(){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+// 古いService Workerとキャッシュを全削除してから再登録
+if('serviceWorker' in navigator){
+  // まず全SWの登録を解除
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+  // 全キャッシュを削除
+  caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))));
+  // 新しいSWを登録
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
