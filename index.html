@@ -556,21 +556,59 @@ function ProblemListScreen({problems,onDelete,onToggleReview}){
 // tab切り替えでもこのコンポーネントはアンマウントしない（MainContentで常に保持）
 function TrainingScreen({problems,onResult,onAddReview}){
   const TOTAL=10,TIME=30;
+  // ─── state ───────────────────────────────────────────
   const [phase,setPhase]=useState('ready');
   const [queue,setQueue]=useState([]);
-  const [idx,setIdx]=useState(0);
+  const [curIdx,setCurIdx]=useState(0);
   const [timeLeft,setTimeLeft]=useState(TIME);
-  const [judged,setJudged]=useState(null);
+  const [judged,setJudged]=useState(null);   // null | 'correct' | 'wrong' | 'timeout'
   const [selectedKey,setSelectedKey]=useState(null);
   const [doneResults,setDoneResults]=useState([]);
   const [toast,setToast]=useState(false);
+  // ─── ref（タイマー管理はrefのみ。useEffectに依存しない） ──
   const timerRef=useRef(null);
-  const nextRef=useRef(null);
-  // stale closure回避用ref
-  const queueRef=useRef([]);
-  const idxRef=useRef(0);
+  const judgedRef=useRef(null);   // judgedのref版（setInterval内で参照）
   const collectedRef=useRef([]);
 
+  // judgedが変わるたびrefも同期
+  useEffect(()=>{ judgedRef.current=judged; },[judged]);
+
+  // アンマウント時クリーンアップ
+  useEffect(()=>()=>{ clearInterval(timerRef.current); },[]);
+
+  // ─── タイマー起動（1問ごとに明示的に呼ぶ） ───────────
+  const startTimer=()=>{
+    clearInterval(timerRef.current);
+    setTimeLeft(TIME);
+    let remaining=TIME;
+    timerRef.current=setInterval(()=>{
+      // 判定済みならタイマー停止（refで判定→stale closureなし）
+      if(judgedRef.current!==null){ clearInterval(timerRef.current); return; }
+      remaining--;
+      setTimeLeft(remaining);
+      if(remaining<=0){
+        clearInterval(timerRef.current);
+        // 時間切れ処理
+        judgedRef.current='timeout';
+        setJudged('timeout');
+        // onResultはqueueとcurIdxのrefから取得
+        queueRefCb.current();
+      }
+    },1000);
+  };
+
+  // queueとcurIdxをrefで保持（setInterval内から最新値を参照するため）
+  const queueRef=useRef([]);
+  const curIdxRef=useRef(0);
+  const queueRefCb=useRef(()=>{});
+  useEffect(()=>{
+    queueRefCb.current=()=>{
+      const cur=queueRef.current[curIdxRef.current];
+      if(cur) onResult(cur.problem.id,false);
+    };
+  });
+
+  // ─── 稽古開始 ─────────────────────────────────────────
   const buildQueue=()=>{
     if(!problems.length)return[];
     const sorted=[...problems].sort((a,b)=>priorityScore(a)-priorityScore(b));
@@ -585,67 +623,49 @@ function TrainingScreen({problems,onResult,onAddReview}){
   };
 
   const startTraining=()=>{
-    clearInterval(timerRef.current);clearTimeout(nextRef.current);
+    clearInterval(timerRef.current);
     const q=buildQueue();
     if(!q.length)return;
-    queueRef.current=q;idxRef.current=0;collectedRef.current=[];
-    setQueue(q);setIdx(0);setJudged(null);setSelectedKey(null);
-    setTimeLeft(TIME);setDoneResults([]);setPhase('question');
+    queueRef.current=q;
+    curIdxRef.current=0;
+    collectedRef.current=[];
+    judgedRef.current=null;
+    setQueue(q);setCurIdx(0);setJudged(null);setSelectedKey(null);
+    setTimeLeft(TIME);setDoneResults([]);
+    setPhase('question');
+    // phaseのstate更新は非同期なのでsetPhase後にタイマー起動
+    setTimeout(()=>startTimer(),0);
   };
 
-  // タイマー：judgedがnullの間だけ動かす。判定済みなら即停止
-  useEffect(()=>{
-    if(phase!=='question'){clearInterval(timerRef.current);return;}
-    if(judged!==null){clearInterval(timerRef.current);return;} // ★判定後は必ず止める
-    setTimeLeft(TIME);
-    clearInterval(timerRef.current);
-    timerRef.current=setInterval(()=>{
-      setTimeLeft(t=>{
-        if(t<=1){clearInterval(timerRef.current);fireTimeout();return 0;}
-        return t-1;
-      });
-    },1000);
-    return()=>clearInterval(timerRef.current);
-  },[phase,idx,judged]);// judgedも依存配列に追加
-
-  const fireTimeout=()=>{
-    const cur=queueRef.current[idxRef.current];
-    if(cur)onResult(cur.problem.id,false);
-    setJudged('timeout');
-    goNext(false);
-  };
-
+  // ─── 牌タップ ─────────────────────────────────────────
   const handleTap=(tile)=>{
-    if(judged!==null)return;
-    clearInterval(timerRef.current);
-    const cur=queueRef.current[idxRef.current];
+    if(judgedRef.current!==null)return;  // 判定済みなら無視
+    clearInterval(timerRef.current);     // タイマー停止
+    const cur=queueRef.current[curIdxRef.current];
     if(!cur)return;
     const isCorrect=tileKey(tile)===tileKey(cur.answer);
+    judgedRef.current=isCorrect?'correct':'wrong';
     setSelectedKey(tileKey(tile));
-    setJudged(isCorrect?'correct':'wrong');
+    setJudged(judgedRef.current);
     onResult(cur.problem.id,isCorrect);
-    goNext(isCorrect);
-  };
-
-  const goNext=(isCorrect)=>{
-    clearTimeout(nextRef.current);
     collectedRef.current=[...collectedRef.current,{isCorrect}];
-    // 正解・不正解どちらもボタン押下まで待機（自動遷移なし）
+    // ★自動遷移なし：ボタン押下待ち
   };
 
+  // ─── 次の問題へ（ボタン押下のみ） ────────────────────
   const advanceToNext=()=>{
-    clearTimeout(nextRef.current);
-    const collected=[...collectedRef.current];
+    clearInterval(timerRef.current);
+    const collected=collectedRef.current;
     if(collected.length>=TOTAL){
-      setDoneResults(collected);setPhase('done');
+      setDoneResults([...collected]);setPhase('done');
     } else {
-      idxRef.current=idxRef.current+1;
-      setIdx(idxRef.current);
+      curIdxRef.current=curIdxRef.current+1;
+      judgedRef.current=null;
+      setCurIdx(curIdxRef.current);
       setJudged(null);setSelectedKey(null);
+      startTimer();  // 新しい問題のタイマーを明示的に起動
     }
   };
-
-  useEffect(()=>()=>{clearInterval(timerRef.current);clearTimeout(nextRef.current);},[]);
 
   const addReviewWithToast=id=>{
     onAddReview(id);setToast(true);
@@ -684,7 +704,7 @@ function TrainingScreen({problems,onResult,onAddReview}){
     );
   }
 
-  const cur=queue[idx];
+  const cur=queue[curIdx];
   if(!cur||phase!=='question')return null;
   const ansKey=tileKey(cur.answer);
   const circ=2*Math.PI*23;
@@ -698,8 +718,8 @@ function TrainingScreen({problems,onResult,onAddReview}){
         fontWeight:700,fontSize:13,zIndex:999,animation:'popIn .25s ease'}}>☆ 復習リストに追加しました</div>}
       <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
         <div style={{flex:1}}>
-          <div style={{fontSize:12,color:'var(--text2)',marginBottom:4}}>問題 {idx+1} / {TOTAL}</div>
-          <div className="progress-bar"><div className="progress-fill" style={{width:`${(idx/TOTAL)*100}%`,background:'var(--accent)'}}/></div>
+          <div style={{fontSize:12,color:'var(--text2)',marginBottom:4}}>問題 {curIdx+1} / {TOTAL}</div>
+          <div className="progress-bar"><div className="progress-fill" style={{width:`${(curIdx/TOTAL)*100}%`,background:'var(--accent)'}}/></div>
         </div>
         {cur.transform!=='none'&&<span className="badge blue">{tfLabel(cur.transform)}</span>}
         <div className="timer-ring">
